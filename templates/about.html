@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>About Iconnect - Connect Workers with Clients</title>
+        <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+        <script>
+            tailwind.config = {
+                darkMode: 'class',
+                theme: {
+                    extend: {
+                        colors: {
+                            primary: '#3b82f6',
+                            secondary: '#10b981',
+                            dark: {
+                                900: '#111827',
+                                800: '#1F2937',
+                                700: '#374151',
+                                600: '#4B5563',
+                                500: '#6B7280',
+                                400: '#9CA3AF'
+                            }
+                        },
+                        borderRadius: {
+                            'none': '0px',
+                            'sm': '4px',
+                            DEFAULT: '8px',
+                            'md': '12px',
+                            'lg': '16px',
+                            'xl': '20px',
+                            '2xl': '24px',
+                            '3xl': '32px',
+                            'full': '9999px',
+                            'button': '8px'
+                        }
+                    }
+                }
+            }
+        </script>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+        <script src="/static/main.js"></script>
+        <style>
+            .hero-gradient {
+                background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%);
+            }
+            .feature-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            }
+            .stats-item {
+                position: relative;
+            }
+            .stats-item:not(:last-child):after {
+                content: "";
+                position: absolute;
+                right: 0;
+                top: 50%;
+                transform: translateY(-50%);
+                height: 50%;
+                width: 1px;
+                background-color: #e5e7eb;
+            }
+            .account-dropdown {
+                display: none;
+                position: absolute;
+                right: 0;
+                top: 100%;
+                min-width: 200px;
+                background: white;
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+                border-radius: 8px;
+                z-index: 100;
+                margin-top: 8px;
+            }
+            
+            
+            .account-dropdown.show {
+                display: block;
+            }
+            
+            .dark .account-dropdown {
+                background: #1F2937;
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+            }
+            .account-dropdown a {
+                display: block;
+                padding: 12px 16px;
+                color: #4b5563;
+                transition: all 0.2s;
+            }
+            
+            
+            .account-dropdown a:hover {
+                background: #f3f4f6;
+                color: #1e40af;
+            }
+            
+            .dark .account-dropdown a {
+                color: #9CA3AF;
+            }
+            
+            .dark .account-dropdown a:hover {
+                background: #374151;
+                color: #3b82f6;
+            }
+            .dark .account-dropdown hr {
+                border-color: #374151;
+            }
+            .account-dropdown hr {
+                border-color: #e5e7eb;
+                margin: 4px 0;
+            }
+            
+            
+            .account-dropdown .text-red-500:hover {
+                color: #ef4444 !important;
+            }
+            
+            .dark .account-dropdown .text-red-500:hover {
+                color: #f87171 !important;
+            }
+        </style>
+    </head>
+
+    <body class="bg-gray-50 dark:bg-gray-900 font-['Inter'] transition-colors duration-300" id="body">
+    <!-- Header -->
+    <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center">
+                <a href="#" class="text-2xl font-['Pacifico'] text-primary mr-10">Iconnect</a>
+                <nav class="hidden md:flex space-x-8">
+                    <a href="index" class="text-gray-700 dark:text-gray-300 hover:text-primary font-medium">Home</a>
+                    <a href="browse" data-role-only="Client" class="text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary font-medium">Browse Workers</a>
+                    <a href="clients" data-role-only="Job Seeker" class="text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary font-medium">Browse Clients</a>
+                    <a href="how_it_works" class="text-gray-700 dark:text-gray-300 hover:text-primary font-medium">How It Works</a>
+                    <a href="about" class="text-primary dark:text-primary font-medium border-b-2 border-primary">About Us</a>
+                </nav>
+            </div>
+            <div class="flex items-center space-x-4">
+
+                <!-- Account Button with Dropdown -->
+                <div class="relative">
+                    <button id="accountButton" class="flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:text-primary">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center text-white">
+                            <i class="ri-user-line"></i>
+                        </div>
+                        <span class="hidden md:inline font-medium">Account</span>
+                        <i class="ri-arrow-down-s-line hidden md:inline transition-transform duration-200" id="accountArrow"></i>
+                    </button>
+                    
+                    <div id="accountDropdown" class="account-dropdown">
+                        <a href="account" class="flex items-center space-x-2">
+                            <i class="ri-user-line"></i>
+                            <span>Profile</span>
+                        </a>
+                        <a href="#" class="flex items-center space-x-2">
+                            <i class="ri-settings-3-line"></i>
+                            <span>Settings</span>
+                        </a>
+                        <a href="#" class="flex items-center space-x-2">
+                            <i class="ri-mail-line"></i>
+                            <span>Messages</span>
+                        </a>
+                        <hr>
+                        <a href="login_page" class="flex items-center space-x-2 text-red-500 hover:text-red-600">
+                            <i class="ri-logout-box-r-line"></i>
+                            <span>Log Out</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 cursor-pointer" id="mobileMenuToggle">
+                    <i class="ri-menu-line ri-lg dark:text-gray-300"></i>
+                </div>
+                <div class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 cursor-pointer" id="darkModeToggle">
+                    <i class="ri-sun-line ri-lg dark:text-gray-300" id="themeIcon"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-gradient text-white py-20">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-6">Connect with the right talent or find your next opportunity</h1>
+            <p class="text-xl max-w-3xl mx-auto opacity-90 mb-8">Join thousands of professionals on the platform that connects skilled workers with clients looking for quality talent.</p>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-16 bg-white dark:bg-gray-800">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                <div class="stats-item py-4">
+                    <div class="text-4xl font-bold text-primary mb-2">10,000+</div>
+                    <div class="text-gray-600 dark:text-gray-300">Active Professionals</div>
+                </div>
+                <div class="stats-item py-4">
+                    <div class="text-4xl font-bold text-primary mb-2">5,000+</div>
+                    <div class="text-gray-600 dark:text-gray-300">Completed Projects</div>
+                </div>
+                <div class="stats-item py-4">
+                    <div class="text-4xl font-bold text-primary mb-2">95%</div>
+                    <div class="text-gray-600 dark:text-gray-300">Satisfaction Rate</div>
+                </div>
+                <div class="py-4">
+                    <div class="text-4xl font-bold text-primary mb-2">50+</div>
+                    <div class="text-gray-600 dark:text-gray-300">Job Categories</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Content -->
+    <section class="py-20">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Our Mission</h2>
+                <div class="prose prose-lg text-gray-600 dark:text-gray-300">
+                    <p class="mb-6">Introducing a groundbreaking platform that bridges the gap between clients seeking talent and individuals on the hunt for job opportunities...</p>
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">For Clients</h3>
+                    <p class="mb-6">Businesses can post job vacancies, specify their requirements, and view potential candidates' profiles...</p>
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">For Job Seekers</h3>
+                    <p class="mb-6">Create comprehensive profiles showcasing your qualifications, making it easier for employers to discover you...</p>
+                    <div class="bg-blue-50 dark:bg-gray-800 p-6 rounded-lg my-8 border-l-4 border-primary">
+                        <h4 class="font-bold text-gray-900 dark:text-white mb-2">Why Choose IConnect?</h4>
+                        <p class="mb-0">With user-friendly navigation and a commitment to facilitating meaningful connections...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-20 bg-gray-50 dark:bg-gray-900">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">Key Features</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="feature-card bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 p-8 rounded-xl shadow-md transition duration-300">
+                    <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                        <i class="ri-search-eye-line ri-2x text-primary"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Advanced Search</h3>
+                    <p>Find exactly what you're looking for with our powerful filtering options...</p>
+                </div>
+                <div class="feature-card bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 p-8 rounded-xl shadow-md transition duration-300">
+                    <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                        <i class="ri-profile-line ri-2x text-primary"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Profile Builder</h3>
+                    <p>Create professional profiles that highlight your skills and experience...</p>
+                </div>
+                <div class="feature-card bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 p-8 rounded-xl shadow-md transition duration-300">
+                    <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                        <i class="ri-shield-check-line ri-2x text-primary"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Verified Reviews</h3>
+                    <p>Trust the process with authentic feedback from both clients and professionals.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 bg-primary text-white">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold mb-6">Ready to Get Started?</h2>
+            <p class="text-xl max-w-2xl mx-auto mb-8 opacity-90">Join thousands of professionals and businesses who are already finding success with IConnect.</p>
+        </div>
+    </section>
+
+    <footer class="bg-gray-900 text-white pt-16 pb-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
+                <div class="lg:col-span-2">
+                    <a href="#" class="text-2xl font-['Pacifico'] text-white mb-4 inline-block">Iconnect</a>
+                    <p class="text-gray-400 mb-6 max-w-md">Connecting skilled professionals with businesses looking for quality talent. Our platform makes it easy to find work or hire the perfect candidate.</p>
+                    <div class="flex space-x-4">
+                        <a href="https://www.facebook.com" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 hover:bg-primary transition-colors">
+                            <i class="ri-facebook-fill"></i>
+                        </a>
+                        <a href="https://x.com" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 hover:bg-primary transition-colors">
+                            <i class="ri-twitter-x-fill"></i>
+                        </a>
+                        <a href="https://www.linkedin.com" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 hover:bg-primary transition-colors">
+                            <i class="ri-linkedin-fill"></i>
+                        </a>
+                        <a href="https://www.instagram.com" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 hover:bg-primary transition-colors">
+                            <i class="ri-instagram-fill"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">For Workers</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Find Jobs</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Create Profile</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Career Resources</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Success Stories</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">FAQ</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">For Clients</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Post a Job</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Browse Talent</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Enterprise Solutions</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Success Stories</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Resources</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Company</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-400 hover:text-white">About Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Press</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Careers</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Contact</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Blog</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-800 pt-8">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="mb-4 md:mb-0">
+                        <p class="text-gray-400">&copy; 2025 IConnect. All rights reserved.</p>
+                    </div>
+
+                    <div class="flex flex-wrap justify-center gap-4">
+                        <a href="#" class="text-gray-400 hover:text-white">Terms of Service</a>
+                        <a href="#" class="text-gray-400 hover:text-white">Privacy Policy</a>
+                        <a href="#" class="text-gray-400 hover:text-white">Cookie Policy</a>
+                        <a href="#" class="text-gray-400 hover:text-white">Accessibility</a>
+                    </div>
+
+                    <div class="mt-4 md:mt-0 flex items-center space-x-3">
+                        <i class="ri-visa-fill ri-lg"></i>
+                        <i class="ri-mastercard-fill ri-lg"></i>
+                        <i class="ri-paypal-fill ri-lg"></i>
+                        <i class="ri-apple-fill ri-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+            <!-- Chat Widget -->
+    <div class="fixed bottom-6 right-6 z-50">
+        <button onclick="window.location.href = '/help';" class="w-14 h-14 flex items-center justify-center rounded-full bg-primary text-white shadow-lg hover:bg-primary/90">
+            <i class="ri-message-3-line ri-lg"></i>
+        </button>
+    </div>
+    </footer>
+
+    <script>
+        // Account dropdown functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const accountButton = document.getElementById('accountButton');
+            const accountDropdown = document.getElementById('accountDropdown');
+            const accountArrow = document.getElementById('accountArrow');
+            
+            if (accountButton && accountDropdown) {
+                accountButton.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    accountDropdown.classList.toggle('show');
+                    
+                    // Rotate arrow icon
+                    if (accountArrow) {
+                        accountArrow.classList.toggle('rotate-180');
+                    }
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!accountButton.contains(e.target) && !accountDropdown.contains(e.target)) {
+                        accountDropdown.classList.remove('show');
+                        if (accountArrow) {
+                            accountArrow.classList.remove('rotate-180');
+                        }
+                    }
+                });
+                
+                // Close dropdown when clicking on a dropdown item
+                const dropdownItems = accountDropdown.querySelectorAll('a');
+                dropdownItems.forEach(item => {
+                    item.addEventListener('click', function() {
+                        accountDropdown.classList.remove('show');
+                        if (accountArrow) {
+                            accountArrow.classList.remove('rotate-180');
+                        }
+                    });
+                });
+            }
+            
+            // Dark mode toggle
+            const toggle = document.getElementById('darkModeToggle');
+            const icon = document.getElementById('themeIcon');
+            
+            if (toggle && icon) {
+                toggle.addEventListener('click', function() {
+                    document.documentElement.classList.toggle('dark');
+                    const isDark = document.documentElement.classList.contains('dark');
+                    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                    
+                    if (isDark) {
+                        icon.classList.remove('ri-sun-line');
+                        icon.classList.add('ri-moon-line');
+                    } else {
+                        icon.classList.remove('ri-moon-line');
+                        icon.classList.add('ri-sun-line');
+                    }
+                });
+                
+                // Check for saved theme preference
+                if (localStorage.getItem('theme') === 'dark' || 
+                    (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.classList.add('dark');
+                    icon.classList.remove('ri-sun-line');
+                    icon.classList.add('ri-moon-line');
+                }
+            }
+            
+            // Mobile menu toggle
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const mobileNav = document.querySelector('nav');
+            
+            if (mobileMenuToggle && mobileNav) {
+                mobileMenuToggle.addEventListener('click', function() {
+                    mobileNav.classList.toggle('hidden');
+                });
+            }
+        });
+    </script>
+</body>
+</html>

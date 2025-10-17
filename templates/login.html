@@ -1,0 +1,525 @@
+<!-- new animated sign up -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IConnect - Connect with the World</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .form-container {
+            backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .input-field {
+            transition: all 0.3s ease;
+        }
+        .input-field:focus {
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.5);
+        }
+        .toggle-forms {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .toggle-forms:hover {
+            transform: translateY(-2px);
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen flex items-center justify-center p-4">
+    <div class="relative w-full max-w-4xl mx-auto">
+        <!-- Background Elements -->
+        <div class="absolute -top-20 -left-20 w-40 h-40 rounded-full bg-purple-300 opacity-20"></div>
+        <div class="absolute -bottom-20 -right-20 w-64 h-64 rounded-full bg-blue-300 opacity-20"></div>
+        
+        <!-- Main Container -->
+        <div class="relative z-10 flex flex-col md:flex-row rounded-2xl overflow-hidden shadow-2xl">
+            <!-- Left Side - Branding -->
+            <div class="w-full md:w-1/2 bg-white p-8 md:p-12 flex flex-col justify-center items-center text-center">
+                <div class="floating mb-8">
+                    <i class="fas fa-globe-americas text-6xl text-purple-600"></i>
+                </div>
+                <h1 class="text-4xl font-bold text-gray-800 mb-2">IConnect</h1>
+                <p class="text-gray-600 mb-6">Connect with people around the world</p>
+                <div class="flex space-x-4">
+                    <button class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center hover:bg-blue-200 transition">
+                        <i class="fab fa-facebook-f"></i>
+                    </button>
+                    <button class="w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center hover:bg-red-200 transition">
+                        <i class="fab fa-google"></i>
+                    </button>
+                    <button class="w-10 h-10 rounded-full bg-blue-400 text-white flex items-center justify-center hover:bg-blue-500 transition">
+                        <i class="fab fa-twitter"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Right Side - Forms -->
+            <div class="w-full md:w-1/2 p-8 md:p-12 form-container">
+                <!-- Login Form (default visible) -->
+                <form id="loginForm" class="space-y-6">
+                    <h2 class="text-2xl font-bold text-white mb-6">Welcome Back</h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label for="loginEmail" class="block text-sm font-medium text-white mb-1">Email</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-envelope text-gray-300"></i>
+                                </div>
+                                <input type="email" id="loginEmail" class="input-field w-full pl-10 pr-4 py-3 rounded-lg bg-white bg-opacity-20 text-white placeholder-gray-300 focus:outline-none" placeholder="your@email.com" required>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label for="loginPassword" class="block text-sm font-medium text-white mb-1">Password</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-lock text-gray-300"></i>
+                                </div>
+                                <input type="password" id="loginPassword" class="input-field w-full pl-10 pr-4 py-3 rounded-lg bg-white bg-opacity-20 text-white placeholder-gray-300 focus:outline-none" placeholder="••••••••" required>
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                    <button type="button" class="text-gray-300 hover:text-white focus:outline-none" id="toggleLoginPassword">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="flex justify-end mt-1">
+                                <a data-target="ForgetPasswordForm"  class="text-sm text-white hover:underline">Forgot password?</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-white text-purple-600 py-3 rounded-lg font-semibold hover:bg-opacity-90 transition duration-300">
+                        Sign In
+                    </button>
+                    
+                    <div class="text-center text-white text-sm">
+                        Don't have an account? 
+                        <span class="toggle-forms font-semibold text-white hover:text-purple-200" data-target="signupForm">Sign up</span>
+                    </div>
+                </form>
+                
+                <!-- Signup Form (hidden by default) -->
+                <form id="signupForm" class="space-y-6 hidden">
+                    <h2 class="text-2xl font-bold text-white mb-6">Create Account</h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label for="signupName" class="block text-sm font-medium text-white mb-1">Full Name</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-user text-gray-300"></i>
+                                </div>
+                                <input type="text" id="signupName" class="input-field w-full pl-10 pr-4 py-3 rounded-lg bg-white bg-opacity-20 text-white placeholder-gray-300 focus:outline-none" placeholder="John Doe" required>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="signuprole" class="block text-sm font-medium text-white mb-1">Role</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-user text-gray-300"></i>
+                                </div>
+                                <select id="signuprole" class="input-field w-full pl-10 pr-4 py-3 rounded-lg bg-white bg-opacity-20 text-white placeholder-gray-300 focus:outline-none" required>
+                                    <option value="" disabled selected class="text-gray-400">Select role</option>
+                                    <option value="Job Seeker">Job Seeker</option>
+                                    <option value="Client">Client</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label for="signupEmail" class="block text-sm font-medium text-white mb-1">Email</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-envelope text-gray-300"></i>
+                                </div>
+                                <input type="email" id="signupEmail" class="input-field w-full pl-10 pr-4 py-3 rounded-lg bg-white bg-opacity-20 text-white placeholder-gray-300 focus:outline-none" placeholder="your@email.com" required>
+                            </div>
+                        </div>
+
+                        <button onclick="sendOTP()" class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 mb-4">
+                         Send OTP
+                        </button>
+                            <div id="otpSection" class="hidden">
+      <input id="otpcode" type="text" placeholder="Enter OTP"
+        class="w-full p-2 border border-gray-300 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+      
+    </div>
+                        
+                        <div>
+                            <label for="signupPassword" class="block text-sm font-medium text-white mb-1">Password</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-lock text-gray-300"></i>
+                                </div>
+                                <input type="password" id="signupPassword" class="input-field w-full pl-10 pr-4 py-3 rounded-lg bg-white bg-opacity-20 text-white placeholder-gray-300 focus:outline-none" placeholder="••••••••" required>
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                    <button type="button" class="text-gray-300 hover:text-white focus:outline-none" id="toggleSignupPassword">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="text-xs text-gray-300 mt-1">Minimum 8 characters with at least one number</div>
+                        </div>
+                        
+                        <div>
+                            <label for="signupConfirmPassword" class="block text-sm font-medium text-white mb-1">Confirm Password</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-lock text-gray-300"></i>
+                                </div>
+                                <input type="password" id="signupConfirmPassword" class="input-field w-full pl-10 pr-4 py-3 rounded-lg bg-white bg-opacity-20 text-white placeholder-gray-300 focus:outline-none" placeholder="••••••••" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <input type="checkbox" id="terms" class="w-4 h-4 rounded bg-white bg-opacity-20 border-gray-300 focus:ring-purple-500">
+                        <label for="terms" class="ml-2 text-sm text-white">
+                            I agree to the <a href="#" class="text-white hover:underline">Terms of Service</a> and <a href="#" class="text-white hover:underline">Privacy Policy</a>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-white text-purple-600 py-3 rounded-lg font-semibold hover:bg-opacity-90 transition duration-300">
+                        Sign Up
+                    </button>
+                    
+                    <div class="text-center text-white text-sm">
+                        Already have an account? 
+                        <span class="toggle-forms font-semibold text-white hover:text-purple-200" data-target="loginForm">Sign in</span>
+                    </div>
+                </form>
+                <form id="ForgetPasswordForm" class="space-y-6 hidden">
+    <h2 class="text-2xl font-bold text-white mb-6">Reset Password</h2>
+    <div class="space-y-4">
+        <div>
+            <label for="forgotEmail" class="block text-sm font-medium text-white mb-1">Email</label>
+            <div class="relative">
+                <input type="email" id="forgotEmail" class="input-field w-full pl-10 pr-4 py-3 rounded-lg bg-white bg-opacity-20 text-white placeholder-gray-300 focus:outline-none" placeholder="your@email.com" required>
+            </div>
+        </div>
+        <button type="button" onclick="sendForgotOTP()" class="w-full bg-white text-purple-600 py-3 rounded-lg font-semibold hover:bg-opacity-90 transition duration-300">
+            Send OTP
+        </button>
+        <div id="forgotOtpSection" class="hidden">
+            <input id="forgotOtpCode" type="text" placeholder="Enter OTP"
+                class="w-full p-2 border border-gray-300 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+<!-- ...existing code... -->
+<div>
+    <label for="forgotNewPassword" class="block text-sm font-medium text-white mb-1">New Password</label>
+    <input type="password" id="forgotNewPassword" autocomplete="new-password"
+        class="input-field w-full py-3 rounded-lg bg-white bg-opacity-20 text-white placeholder-gray-300 focus:outline-none"
+        placeholder="New password" required>
+</div>
+<div>
+    <label for="forgotConfirmPassword" class="block text-sm font-medium text-white mb-4"></label>
+    <input type="password" id="forgotConfirmPassword" autocomplete="new-password"
+        class="input-field w-full py-3 rounded-lg bg-white bg-opacity-20 text-white placeholder-gray-300 focus:outline-none"
+        placeholder="Confirm password" required>
+</div>
+<!-- ...existing code... -->
+        </div>
+    </div>
+    <button type="submit" class="w-full bg-white text-purple-600 py-3 rounded-lg font-semibold hover:bg-opacity-90 transition duration-300">
+        Reset Password
+    </button>
+    <div class="text-center text-white text-sm">
+        <span class="toggle-forms font-semibold text-white hover:text-purple-200" data-target="loginForm">Back to Login</span>
+    </div>
+</form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-10 opacity-0 transition-all duration-300 hidden">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span id="toastMessage">Success! You're logged in.</span>
+        </div>
+    </div>
+
+<!DOCTYPE html>
+<html lang="en">
+<!-- ... [rest of your HTML remains the same until the JavaScript section] ... -->
+
+<script>
+    // DOM Elements
+    const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
+    const forgetPasswordForm = document.getElementById('ForgetPasswordForm');
+    const toggleForms = document.querySelectorAll('.toggle-forms');
+    const toggleLoginPassword = document.getElementById('toggleLoginPassword');
+    const toggleSignupPassword = document.getElementById('toggleSignupPassword');
+    const loginPassword = document.getElementById('loginPassword');
+    const signupPassword = document.getElementById('signupPassword');
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toastMessage');
+    const otpSection = document.getElementById('otpSection');
+    const otpCode = document.getElementById('otpcode');
+
+
+    document.querySelectorAll('a[data-target="ForgetPasswordForm"]').forEach(link => {
+    link.addEventListener('click', function(e) {
+        e.preventDefault();
+        loginForm.classList.add('hidden');
+        signupForm.classList.add('hidden');
+        forgetPasswordForm.classList.remove('hidden');
+    });
+});
+// ...existing code...
+// ...existing code...
+
+// Send OTP for Forgot Password
+async function sendForgotOTP() {
+    showToast('Sending OTP...');
+    document.getElementById('forgotOtpSection').classList.remove('hidden');
+    const email = document.getElementById('forgotEmail').value;
+    if (!email) {
+        showToast('Please enter your email', true);
+        return;
+    }
+    const response = await fetch('/send-forgot-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+    });
+    const data = await response.json();
+    if (response.ok) {
+        showToast('OTP sent to your email!');
+        document.getElementById('forgotOtpSection').classList.remove('hidden');
+    } else {
+        showToast(data.error || 'Failed to send OTP', true);
+    }
+}
+
+// Handle Forgot Password Form Submission
+document.getElementById('ForgetPasswordForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const email = document.getElementById('forgotEmail').value;
+    const otp = document.getElementById('forgotOtpCode').value;
+    const newPassword = document.getElementById('forgotNewPassword').value;
+    const confirmPassword = document.getElementById('forgotConfirmPassword').value;
+
+    if (!otp) {
+        showToast('Please enter the OTP sent to your email', true);
+        return;
+    }
+    if (newPassword.length < 8 || !/\d/.test(newPassword)) {
+        showToast('Password must be at least 8 characters with at least one number', true);
+        return;
+    }
+    if (newPassword !== confirmPassword) {
+        showToast('Passwords do not match', true);
+        return;
+    }
+
+    const response = await fetch('/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp, newPassword })
+    });
+    const data = await response.json();
+    if (response.ok) {
+        showToast('Password reset successful!');
+        this.reset();
+        document.getElementById('forgotOtpSection').classList.add('hidden');
+        loginForm.classList.remove('hidden');
+        forgetPasswordForm.classList.add('hidden');
+    } else {
+        showToast(data.error || 'Failed to reset password', true);
+    }
+});
+    // Toggle between login and signup forms
+toggleForms.forEach(button => {
+    button.addEventListener('click', function() {
+        const target = this.getAttribute('data-target');
+        loginForm.classList.add('hidden');
+        signupForm.classList.add('hidden');
+        forgetPasswordForm.classList.add('hidden');
+        if (target === 'loginForm') loginForm.classList.remove('hidden');
+        if (target === 'signupForm') signupForm.classList.remove('hidden');
+        if (target === 'ForgetPasswordForm') forgetPasswordForm.classList.remove('hidden');
+    });
+});
+
+        function showToast(message, isError = false) {
+      const toast = document.getElementById('toast');
+      toast.innerText = message;
+      toast.className = `mt-4 p-2 text-center text-white rounded ${isError ? 'bg-red-500' : 'bg-green-500'}`;
+      toast.classList.remove('hidden');
+      setTimeout(() => toast.classList.add('hidden'), 4000);
+    }
+    function showToast(message, isError = false) {
+      const toast = document.getElementById('toast');
+      toast.innerText = message;
+      toast.className = `mt-4 p-2 text-center text-white rounded ${isError ? 'bg-red-500' : 'bg-green-500'}`;
+      toast.classList.remove('hidden');
+      setTimeout(() => toast.classList.add('hidden'), 4000);
+    }
+
+    async function sendOTP() {
+      const email = document.getElementById('signupEmail').value;
+      document.getElementById('otpSection').classList.remove('hidden');
+
+      if (!email) {
+        showToast('Please enter your email', true);
+        return;
+      }
+
+      const response = await fetch('/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+        
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        showToast('OTP sent to your email!');
+
+      } else {
+        showToast(data.error || 'Failed to send OTP', true);
+      }
+    }
+
+
+
+    // Toggle password visibility
+    toggleLoginPassword.addEventListener('click', function() {
+        const type = loginPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+        loginPassword.setAttribute('type', type);
+        this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+    });
+
+    toggleSignupPassword.addEventListener('click', function() {
+        const type = signupPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+        signupPassword.setAttribute('type', type);
+        this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+    });
+
+    // Show toast notification
+    function showToast(message, isError = false) {
+        toastMessage.textContent = message;
+        toast.className = isError 
+            ? 'fixed bottom-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-0 opacity-100 transition-all duration-300 flex items-center'
+            : 'fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-0 opacity-100 transition-all duration-300 flex items-center';
+        setTimeout(() => {
+            toast.classList.remove('translate-y-0', 'opacity-100');
+            toast.classList.add('translate-y-10', 'opacity-0');
+        }, 3000);
+    }
+
+    // Login form submission
+    loginForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        
+        const response = await fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+        
+        const data = await response.json();
+        if (response.ok) {
+            showToast(data.message);
+            window.location.href = '/index';
+        } else {
+            showToast(data.error || 'Login failed', true);
+        }
+    });
+
+    // Signup form submission with integrated OTP
+    signupForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Get form values
+        const name = document.getElementById('signupName').value;
+        const email = document.getElementById('signupEmail').value;
+        const role = document.getElementById('signuprole').value;
+        const password = document.getElementById('signupPassword').value;
+        const confirmPassword = document.getElementById('signupConfirmPassword').value;
+        const terms = document.getElementById('terms').checked;
+        
+        // Validate inputs
+        if (password !== confirmPassword) {
+            showToast('Passwords do not match', true);
+            return;
+        }
+        
+        if (!terms) {
+            showToast('You must accept the terms and conditions', true);
+            return;
+        }
+        
+        if (password.length < 8 || !/\d/.test(password)) {
+            showToast('Password must be at least 8 characters with at least one number', true);
+            return;
+        }
+        
+        // Check if OTP is provided
+        const otp = otpCode.value;
+        if (!otp) {
+            showToast('Please enter the OTP sent to your email', true);
+            return;
+        }
+        
+        try {
+            // First send OTP to verify
+            const otpResponse = await fetch('/verify-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, otp })
+            });
+            
+            const otpData = await otpResponse.json();
+            
+            if (!otpResponse.ok ) {
+                showToast(otpData.error || 'Invalid OTP', true);
+                return;
+            }
+            
+            // OTP verified, proceed with signup
+            const signupResponse = await fetch('/api/signup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, role, password })
+            });
+            
+            const signupData = await signupResponse.json();
+            
+            if (signupResponse.ok) {
+                showToast(signupData.message || 'Account created successfully');
+                loginForm.classList.remove('hidden');
+                signupForm.classList.add('hidden');
+                this.reset();
+                otpCode.value = '';
+            } else {
+                showToast(signupData.error || 'Signup failed', true);
+            }
+        } catch (error) {
+            showToast('An error occurred during signup', true);
+            console.error(error);
+        }
+    });
+</script>
+</body>
+</html>
+</body>
+</html>

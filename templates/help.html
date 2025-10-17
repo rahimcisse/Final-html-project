@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help & Support - iConnect</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+        <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>tailwind.config={theme:{extend:{colors:{primary:'#3b82f6',secondary:'#10b981'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+    <link href='static/mainhelp.css' rel='stylesheet'>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='1.ico') }}">
+<style>
+</style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="#" class="text-2xl font-['Pacifico'] text-primary mr-10">Iconnect</a>
+                <nav class="nav">
+                    <a href="index" class="nav-link">Home</a>
+                    <a href="#faq" class="nav-link">FAQ</a>
+                    <a href="#contact" class="nav-link">Contact</a>
+                    <a href="#resources" class="nav-link">Resources</a>
+                      
+                <div class="w-10 h-10 flex items-center justify-center rounded-full " id="darkModeToggle">
+                    <i class="ri-sun-line ri-lg dark:text-gray-300" id="themeIcon"></i>
+                </div>
+                </nav>
+                
+            </div>
+            
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">How can we help you?</h1>
+                <p class="hero-subtitle">Find answers, get support, and make the most of iConnect</p>
+                
+
+                <!-- Quick Links -->
+                <div class="quick-links">
+                    <button class="quick-link-btn" data-target="employers">
+                        <i class="fas fa-building"></i>
+                        <span>For Employers</span>
+                    </button>
+                    <button class="quick-link-btn" data-target="jobseekers">
+                        <i class="fas fa-user-tie"></i>
+                        <span>For Job Seekers</span>
+                    </button>
+                    <button class="quick-link-btn" data-target="technical">
+                        <i class="fas fa-cog"></i>
+                        <span>Technical Support</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Support Categories -->
+    <section class="support-categories" id="categories">
+        <div class="container">
+            <h2 class="section-title">Browse by Category</h2>
+            <div class="category-grid">
+                <div class="category-card" data-category="getting-started">
+                    <div class="category-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h3 class="category-title">Getting Started</h3>
+                    <p class="category-desc">Learn the basics of using iConnect</p>
+                    <span class="article-count">8 articles</span>
+                </div>
+
+                <div class="category-card" data-category="account-management">
+                    <div class="category-icon">
+                        <i class="fas fa-user-cog"></i>
+                    </div>
+                    <h3 class="category-title">Account Management</h3>
+                    <p class="category-desc">Manage your profile and settings</p>
+                    <span class="article-count">12 articles</span>
+                </div>
+
+                <div class="category-card" data-category="job-posting">
+                    <div class="category-icon">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <h3 class="category-title">Job Posting</h3>
+                    <p class="category-desc">Create and manage job listings</p>
+                    <span class="article-count">15 articles</span>
+                </div>
+
+                <div class="category-card" data-category="applications">
+                    <div class="category-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <h3 class="category-title">Applications</h3>
+                    <p class="category-desc">Apply for jobs and track progress</p>
+                    <span class="article-count">10 articles</span>
+                </div>
+
+                <div class="category-card" data-category="billing">
+                    <div class="category-icon">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                    <h3 class="category-title">Billing & Plans</h3>
+                    <p class="category-desc">Subscription and payment help</p>
+                    <span class="article-count">6 articles</span>
+                </div>
+
+                <div class="category-card" data-category="privacy">
+                    <div class="category-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3 class="category-title">Privacy & Security</h3>
+                    <p class="category-desc">Keep your data safe and secure</p>
+                    <span class="article-count">9 articles</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section" id="faq">
+        <div class="container">
+            <h2 class="section-title">Frequently Asked Questions</h2>
+            
+            <!-- FAQ Tabs -->
+            <div class="faq-tabs">
+                <button class="faq-tab active" data-tab="general">General</button>
+                <button class="faq-tab" data-tab="employers">For Employers</button>
+                <button class="faq-tab" data-tab="jobseekers">For Job Seekers</button>
+            </div>
+
+            <!-- FAQ Content -->
+            <div class="faq-content">
+                <div class="faq-tab-content active" id="general">
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>What is iConnect and how does it work?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>iConnect is a professional networking platform that bridges the gap between talented job seekers and forward-thinking employers. Our platform uses advanced matching algorithms to connect the right people with the right opportunities.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>Is iConnect free to use?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Job seekers can use iConnect completely free. Employers have access to basic features for free, with premium plans available for advanced features like priority listings and detailed analytics.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>How do I create an account?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Simply click the "Sign Up" button on our homepage, choose whether you're an employer or job seeker, and follow the guided setup process. You'll be up and running in under 5 minutes.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-tab-content" id="employers">
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>How do I post a job listing?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>After logging in, click "Post a Job" in your dashboard. Fill out the job details, requirements, and company information. Your listing will be live within minutes of submission.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>How do I review applications?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Applications are automatically organized in your employer dashboard. You can filter by qualifications, experience level, and other criteria to find the best matches quickly.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>What are the benefits of premium employer plans?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Premium plans include priority job placement, advanced candidate filtering, detailed analytics, unlimited job postings, and dedicated account support.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-tab-content" id="jobseekers">
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>How do I optimize my profile?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Complete all profile sections, add relevant skills and keywords, upload a professional photo, and regularly update your experience. Our system will suggest improvements based on industry standards.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>How do I track my applications?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Your "My Applications" dashboard shows all submitted applications, their current status, and any messages from employers. You'll also receive email notifications for status updates.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>Can I set up job alerts?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Yes! Set up custom job alerts based on keywords, location, salary range, and job type. You'll receive notifications when matching positions are posted.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section" id="contact">
+        <div class="container">
+            <h2 class="section-title">Get in Touch</h2>
+            
+            <div class="contact-grid">
+                <!-- Contact Methods -->
+                <div class="contact-methods">
+                    <h3>Contact Methods</h3>
+                    
+                    <div class="contact-method">
+                        <div class="method-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="method-content">
+                            <h4>Email Support</h4>
+                            <p>abdulrahimmogtaricisse@gmail.com</p>
+                            <span class="response-time">Response within 24 hours</span>
+                        </div>
+                    </div>
+
+                    <div class="contact-method">
+                        <div class="method-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="method-content">
+                            <h4>Phone Support</h4>
+                            <p>053-94-66551-iCONNECT</p>
+                            <span class="response-time">Mon-Fri, 9AM-6PM EST</span>
+                        </div>
+                    </div>
+
+                    <div class="contact-method">
+                        <div class="method-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div class="method-content">
+                            <h4>Live Chat</h4>
+                            <p>Chat with our support team</p>
+                            <button class="chat-btn">Start Chat</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Form -->
+                <div class="contact-form-container">
+                    <h3 class="dark:text-white">Send us a Message</h3>
+                    <form class="contact-form" id="contactForm">
+                        <div class="form-group">
+                            <label for="name">Full Name *</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email Address *</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="userType">I am a *</label>
+                            <select id="userType" name="userType" required>
+                                <option value="">Select...</option>
+                                <option value="jobseeker">Job Seeker</option>
+                                <option value="employer">Employer</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="category">Issue Category *</label>
+                            <select id="category" name="category" required>
+                                <option value="">Select...</option>
+                                <option value="technical">Technical Issue</option>
+                                <option value="account">Account Problem</option>
+                                <option value="billing">Billing Question</option>
+                                <option value="general">General Inquiry</option>
+                                <option value="feedback">Feedback</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="subject">Subject *</label>
+                            <input type="text" id="subject" name="subject" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="message">Message *</label>
+                            <textarea id="message" name="message" rows="5" required placeholder="Please describe your issue in detail..."></textarea>
+                        </div>
+
+                        <button type="submit" class="submit-btn">
+                            <i class="fas fa-paper-plane"></i>
+                            Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Resources Section -->
+    <section class="resources-section" id="resources">
+        <div class="container">
+            <h2 class="section-title">Resources & Downloads</h2>
+            
+            <div class="resources-grid">
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <i class="fas fa-download"></i>
+                    </div>
+                    <h3>User Guide PDF</h3>
+                    <p>Complete guide to using iConnect</p>
+                    <a href="#" class="resource-link">Download</a>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    <h3>Video Tutorials</h3>
+                    <p>Step-by-step video walkthroughs</p>
+                    <a href="#" class="resource-link">Watch Now</a>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <h3>API Documentation</h3>
+                    <p>For developers and integrations</p>
+                    <a href="#" class="resource-link">View Docs</a>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <i class="fas fa-bullhorn"></i>
+                    </div>
+                    <h3>What's New</h3>
+                    <p>Latest updates and features</p>
+                    <a href="#" class="resource-link">Read More</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white pt-16 pb-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
+                <div class="lg:col-span-2">
+                    <a href="#" class="text-2xl font-['Pacifico'] text-white mb-4 inline-block">Iconnect</a>
+                    <p class="text-gray-400 mb-6 max-w-md">Connecting skilled professionals with businesses looking for quality talent. Our platform makes it easy to find work or hire the perfect candidate.</p>
+                    <div class="flex space-x-4">
+                        <a href="https://www.facebook.com" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 hover:bg-primary transition-colors">
+                            <i class="ri-facebook-fill"></i>
+                        </a>
+                        <a href="https://x.com" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 hover:bg-primary transition-colors">
+                            <i class="ri-twitter-x-fill"></i>
+                        </a>
+                        <a href="https://www.linkedin.com" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 hover:bg-primary transition-colors">
+                            <i class="ri-linkedin-fill"></i>
+                        </a>
+                        <a href="https://www.instagram.com" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 hover:bg-primary transition-colors">
+                            <i class="ri-instagram-fill"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">For Workers</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Find Jobs</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Create Profile</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Career Resources</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Success Stories</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">FAQ</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">For Clients</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Post a Job</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Browse Talent</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Enterprise Solutions</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Success Stories</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Resources</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Company</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-400 hover:text-white">About Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Press</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Careers</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Contact</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Blog</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 pt-8">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="mb-4 md:mb-0">
+                        <p class="text-gray-400">&copy; 2025 IConnect. All rights reserved.</p>
+                    </div>
+                    
+                    <div class="flex flex-wrap justify-center gap-4">
+                        <a href="#" class="text-gray-400 hover:text-white">Terms of Service</a>
+                        <a href="#" class="text-gray-400 hover:text-white">Privacy Policy</a>
+                        <a href="#" class="text-gray-400 hover:text-white">Cookie Policy</a>
+                        <a href="#" class="text-gray-400 hover:text-white">Accessibility</a>
+                    </div>
+                    
+                    <div class="mt-4 md:mt-0 flex items-center space-x-3">
+                        <i class="ri-visa-fill ri-lg"></i>
+                        <i class="ri-mastercard-fill ri-lg"></i>
+                        <i class="ri-paypal-fill ri-lg"></i>
+                        <i class="ri-apple-fill ri-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script >// DOM Elements
+const searchInput = document.getElementById('searchInput');
+const quickLinkBtns = document.querySelectorAll('.quick-link-btn');
+const categoryCards = document.querySelectorAll('.category-card');
+const faqTabs = document.querySelectorAll('.faq-tab');
+const faqTabContents = document.querySelectorAll('.faq-tab-content');
+const faqItems = document.querySelectorAll('.faq-item');
+const contactForm = document.getElementById('contactForm');
+const chatBtn = document.querySelector('.chat-btn');
+
+// FAQ Data for search functionality
+const faqData = {
+    general: [
+        {
+            question: "What is iConnect and how does it work?",
+            answer: "iConnect is a professional networking platform that bridges the gap between talented job seekers and forward-thinking employers. Our platform uses advanced matching algorithms to connect the right people with the right opportunities.",
+            keywords: ["platform", "networking", "matching", "algorithm", "connect"]
+        },
+        {
+            question: "Is iConnect free to use?",
+            answer: "Job seekers can use iConnect completely free. Employers have access to basic features for free, with premium plans available for advanced features like priority listings and detailed analytics.",
+            keywords: ["free", "pricing", "premium", "cost", "plans"]
+        },
+        {
+            question: "How do I create an account?",
+            answer: "Simply click the 'Sign Up' button on our homepage, choose whether you're an employer or job seeker, and follow the guided setup process. You'll be up and running in under 5 minutes.",
+            keywords: ["account", "signup", "register", "create", "setup"]
+        }
+    ],
+    employers: [
+        {
+            question: "How do I post a job listing?",
+            answer: "After logging in, click 'Post a Job' in your dashboard. Fill out the job details, requirements, and company information. Your listing will be live within minutes of submission.",
+            keywords: ["job", "posting", "listing", "employer", "dashboard"]
+        },
+        {
+            question: "How do I review applications?",
+            answer: "Applications are automatically organized in your employer dashboard. You can filter by qualifications, experience level, and other criteria to find the best matches quickly.",
+            keywords: ["applications", "review", "filter", "candidates", "dashboard"]
+        },
+        {
+            question: "What are the benefits of premium employer plans?",
+            answer: "Premium plans include priority job placement, advanced candidate filtering, detailed analytics, unlimited job postings, and dedicated account support.",
+            keywords: ["premium", "benefits", "priority", "analytics", "unlimited", "support"]
+        }
+    ],
+    jobseekers: [
+        {
+            question: "How do I optimize my profile?",
+            answer: "Complete all profile sections, add relevant skills and keywords, upload a professional photo, and regularly update your experience. Our system will suggest improvements based on industry standards.",
+            keywords: ["profile", "optimize", "skills", "keywords", "photo", "experience"]
+        },
+        {
+            question: "How do I track my applications?",
+            answer: "Your 'My Applications' dashboard shows all submitted applications, their current status, and any messages from employers. You'll also receive email notifications for status updates.",
+            keywords: ["track", "applications", "status", "dashboard", "notifications"]
+        },
+        {
+            question: "Can I set up job alerts?",
+            answer: "Yes! Set up custom job alerts based on keywords, location, salary range, and job type. You'll receive notifications when matching positions are posted.",
+            keywords: ["alerts", "notifications", "keywords", "location", "salary", "job type"]
+        }
+    ]
+};
+
+// Initialize the application
+document.addEventListener('DOMContentLoaded', function() {
+    initializeComponents();
+    setupEventListeners();
+    addScrollAnimations();
+});
+
+// Initialize all components
+function initializeComponents() {
+    // Set active states
+    if (faqTabs.length > 0) {
+        faqTabs[0].classList.add('active');
+    }
+    if (faqTabContents.length > 0) {
+        faqTabContents[0].classList.add('active');
+    }
+}
+
+// Setup all event listeners
+function setupEventListeners() {
+    // Search functionality
+    if (searchInput) {
+        searchInput.addEventListener('input', handleSearch);
+    }
+
+    // Quick link buttons
+    quickLinkBtns.forEach(btn => {
+        btn.addEventListener('click', handleQuickLinkClick);
+    });
+
+    // Category cards
+    categoryCards.forEach(card => {
+        card.addEventListener('click', handleCategoryClick);
+    });
+
+    // FAQ tabs
+    faqTabs.forEach(tab => {
+        tab.addEventListener('click', handleFaqTabClick);
+    });
+
+    // FAQ items
+    faqItems.forEach(item => {
+        const question = item.querySelector('.faq-question');
+        if (question) {
+            question.addEventListener('click', () => toggleFaqItem(item));
+        }
+    });
+
+    // Contact form
+    if (contactForm) {
+        contactForm.addEventListener('submit', handleContactFormSubmit);
+    }
+
+    // Chat button
+    if (chatBtn) {
+        chatBtn.addEventListener('click', handleChatBtnClick);
+    }
+
+    // Smooth scroll for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                const headerOffset = 80;
+                const elementPosition = target.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+}
+
+// Handle search functionality
+function handleSearch(e) {
+    const searchTerm = e.target.value.toLowerCase().trim();
+    
+    if (searchTerm.length < 2) {
+        showAllFaqItems();
+        return;
+    }
+
+    // Search through FAQ data
+    const results = searchFaqData(searchTerm);
+    displaySearchResults(results, searchTerm);
+}
+
+// Search through FAQ data
+function searchFaqData(searchTerm) {
+    const results = [];
+    
+    Object.keys(faqData).forEach(category => {
+        faqData[category].forEach((item, index) => {
+            const questionMatch = item.question.toLowerCase().includes(searchTerm);
+            const answerMatch = item.answer.toLowerCase().includes(searchTerm);
+            const keywordMatch = item.keywords.some(keyword => 
+                keyword.toLowerCase().includes(searchTerm)
+            );
+            
+            if (questionMatch || answerMatch || keywordMatch) {
+                results.push({
+                    ...item,
+                    category,
+                    index,
+                    relevanceScore: calculateRelevanceScore(item, searchTerm)
+                });
+            }
+        });
+    });
+    
+    return results.sort((a, b) => b.relevanceScore - a.relevanceScore);
+}
+
+// Calculate relevance score for search results
+function calculateRelevanceScore(item, searchTerm) {
+    let score = 0;
+    
+    // Exact question match gets highest score
+    if (item.question.toLowerCase().includes(searchTerm)) {
+        score += 10;
+    }
+    
+    // Answer match gets medium score
+    if (item.answer.toLowerCase().includes(searchTerm)) {
+        score += 5;
+    }
+    
+    // Keyword match gets lower score
+    item.keywords.forEach(keyword => {
+        if (keyword.toLowerCase().includes(searchTerm)) {
+            score += 2;
+        }
+    });
+    
+    return score;
+}
+
+// Display search results
+function displaySearchResults(results, searchTerm) {
+    // Hide all FAQ items first
+    faqItems.forEach(item => {
+        item.style.display = 'none';
+    });
+
+    if (results.length === 0) {
+        showNoResultsMessage(searchTerm);
+        return;
+    }
+
+    // Show relevant FAQ items
+    results.forEach(result => {
+        const tabContent = document.getElementById(result.category);
+        if (tabContent) {
+            const faqItem = tabContent.querySelectorAll('.faq-item')[result.index];
+            if (faqItem) {
+                faqItem.style.display = 'block';
+                highlightSearchTerm(faqItem, searchTerm);
+            }
+        }
+    });
+
+    // Switch to the tab of the most relevant result
+    if (results.length > 0) {
+        switchToFaqTab(results[0].category);
+    }
+}
+
+// Show all FAQ items (clear search)
+function showAllFaqItems() {
+    faqItems.forEach(item => {
+        item.style.display = 'block';
+        // Remove any highlighting
+        const question = item.querySelector('.faq-question span');
+        const answer = item.querySelector('.faq-answer p');
+        if (question) question.innerHTML = question.textContent;
+        if (answer) answer.innerHTML = answer.textContent;
+    });
+}
+
+// Show no results message
+function showNoResultsMessage(searchTerm) {
+    // You could implement this to show a "No results found" message
+    console.log(`No results found for: ${searchTerm}`);
+}
+
+// Highlight search term in results
+function highlightSearchTerm(faqItem, searchTerm) {
+    const question = faqItem.querySelector('.faq-question span');
+    const answer = faqItem.querySelector('.faq-answer p');
+    
+    if (question) {
+        question.innerHTML = highlightText(question.textContent, searchTerm);
+    }
+    
+    if (answer) {
+        answer.innerHTML = highlightText(answer.textContent, searchTerm);
+    }
+}
+
+// Highlight text utility function
+function highlightText(text, searchTerm) {
+    if (!searchTerm) return text;
+    
+    const regex = new RegExp(`(${searchTerm})`, 'gi');
+    return text.replace(regex, '<mark style="background-color: #fef08a; padding: 2px 4px; border-radius: 2px;">$1</mark>');
+}
+
+// Handle quick link button clicks
+function handleQuickLinkClick(e) {
+    const target = e.currentTarget.dataset.target;
+    
+    // Add visual feedback
+    e.currentTarget.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+        e.currentTarget.style.transform = '';
+    }, 150);
+    
+    // Switch to appropriate FAQ tab
+    if (target && (target === 'employers' || target === 'jobseekers')) {
+        switchToFaqTab(target);
+        
+        // Scroll to FAQ section
+        const faqSection = document.getElementById('faq');
+        if (faqSection) {
+            const headerOffset = 80;
+            const elementPosition = faqSection.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+            });
+        }
+    } else if (target === 'technical') {
+        // Scroll to contact section for technical support
+        const contactSection = document.getElementById('contact');
+        if (contactSection) {
+            const headerOffset = 80;
+            const elementPosition = contactSection.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+            });
+        }
+    }
+}
+
+// Handle category card clicks
+function handleCategoryClick(e) {
+    const category = e.currentTarget.dataset.category;
+    
+    // Add visual feedback
+    e.currentTarget.style.transform = 'scale(0.98)';
+    setTimeout(() => {
+        e.currentTarget.style.transform = '';
+    }, 150);
+    
+    // You could implement category-specific filtering here
+    console.log(`Selected category: ${category}`);
+    
+    // For now, scroll to FAQ section
+    const faqSection = document.getElementById('faq');
+    if (faqSection) {
+        const headerOffset = 80;
+        const elementPosition = faqSection.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+        window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+        });
+    }
+}
+
+// Handle FAQ tab clicks
+function handleFaqTabClick(e) {
+    const tabName = e.currentTarget.dataset.tab;
+    switchToFaqTab(tabName);
+}
+
+// Switch to FAQ tab
+function switchToFaqTab(tabName) {
+    // Remove active class from all tabs and contents
+    faqTabs.forEach(tab => tab.classList.remove('active'));
+    faqTabContents.forEach(content => content.classList.remove('active'));
+    
+    // Add active class to selected tab and content
+    const selectedTab = document.querySelector(`[data-tab="${tabName}"]`);
+    const selectedContent = document.getElementById(tabName);
+    
+    if (selectedTab) selectedTab.classList.add('active');
+    if (selectedContent) selectedContent.classList.add('active');
+}
+
+// Toggle FAQ item
+function toggleFaqItem(item) {
+    const isActive = item.classList.contains('active');
+    
+    // Close all FAQ items in the current tab
+    const currentTab = item.closest('.faq-tab-content');
+    if (currentTab) {
+        currentTab.querySelectorAll('.faq-item').forEach(faqItem => {
+            faqItem.classList.remove('active');
+        });
+    }
+    
+    // Open the clicked item if it wasn't already open
+    if (!isActive) {
+        item.classList.add('active');
+    }
+}
+
+// Handle contact form submission
+function handleContactFormSubmit(e) {
+    e.preventDefault();
+
+    const formData = new FormData(contactForm);
+    const data = Object.fromEntries(formData);
+
+    // Add loading state to submit button
+    const submitBtn = contactForm.querySelector('.submit-btn');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+    submitBtn.disabled = true;
+
+    // Send data to backend
+    fetch('/submit_message', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.status === 'success') {
+            submitBtn.innerHTML = '<i class="fas fa-check"></i> Message Sent!';
+            submitBtn.style.backgroundColor = 'var(--success-color)';
+            setTimeout(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                submitBtn.style.backgroundColor = '';
+                contactForm.reset();
+                showNotification('Your message has been sent successfully! We\'ll get back to you within 24 hours.', 'success');
+            }, 2000);
+        } else {
+            throw new Error('Failed to send');
+        }
+    })
+    .catch(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+        showNotification('There was an error sending your message. Please try again.', 'error');
+    });
+}
+// Handle chat button click
+function handleChatBtnClick() {
+    // Simulate starting a chat
+    showNotification('Chat feature coming soon! Please use our contact form or email for now.', 'info');
+}
+
+// Show notification
+function showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <i class="fas ${getNotificationIcon(type)}"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    // Add styles
+    notification.style.cssText = `
+        position: fixed;
+        top: 100px;
+        right: 24px;
+        background: ${getNotificationColor(type)};
+        color: white;
+        padding: 16px 24px;
+        border-radius: 8px;
+        box-shadow: var(--shadow-lg);
+        z-index: 1001;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        max-width: 400px;
+    `;
+    
+    notification.querySelector('.notification-content').style.cssText = `
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    `;
+    
+    // Add to page
+    document.body.appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    // Remove after delay
+    setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 4000);
+}
+
+// Get notification icon based on type
+function getNotificationIcon(type) {
+    switch (type) {
+        case 'success': return 'fa-check-circle';
+        case 'error': return 'fa-exclamation-circle';
+        case 'warning': return 'fa-exclamation-triangle';
+        default: return 'fa-info-circle';
+    }
+}
+
+// Get notification color based on type
+function getNotificationColor(type) {
+    switch (type) {
+        case 'success': return 'var(--success-color)';
+        case 'error': return 'var(--error-color)';
+        case 'warning': return 'var(--warning-color)';
+        default: return 'var(--primary-color)';
+    }
+}
+
+// Add scroll animations
+function addScrollAnimations() {
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('fade-in');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+    
+    // Observe elements for animation
+    const animatedElements = document.querySelectorAll('.category-card, .faq-item, .contact-method, .resource-card');
+    animatedElements.forEach(el => {
+        observer.observe(el);
+    });
+}
+
+// ...existing code...
+window.addEventListener('scroll', () => {
+    const header = document.querySelector('.header');
+    const isDark = document.documentElement.classList.contains('dark');
+    if (header) {
+        if (window.scrollY > 100) {
+            if (isDark) {
+                header.style.backgroundColor = 'rgba(31, 41, 55, 0.95)'; // dark: #1F2937
+            } else {
+                header.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+            }
+            header.style.backdropFilter = 'blur(10px)';
+        } else {
+            if (isDark) {
+                header.style.backgroundColor = '#1F2937';
+            } else {
+                header.style.backgroundColor = 'var(--bg-primary)';
+            }
+            header.style.backdropFilter = 'none';
+        }
+    }
+});
+// ...existing code...
+
+// Keyboard accessibility
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        // Close any open FAQ items
+        faqItems.forEach(item => {
+            item.classList.remove('active');
+        });
+    }
+});
+
+// Touch and mobile enhancements
+if ('ontouchstart' in window) {
+    // Add touch feedback for interactive elements
+    const interactiveElements = document.querySelectorAll('.category-card, .resource-card, .quick-link-btn, .faq-question');
+    
+    interactiveElements.forEach(element => {
+        element.addEventListener('touchstart', () => {
+            element.style.transform = 'scale(0.98)';
+        });
+        
+        element.addEventListener('touchend', () => {
+            setTimeout(() => {
+                element.style.transform = '';
+            }, 150);
+        });
+    });
+
+}
+// ...existing code...
+
+// Dark mode toggle and header color logic
+const toggle = document.getElementById('darkModeToggle');
+const icon = document.getElementById('themeIcon');
+
+function updateHeaderColor() {
+    const header = document.querySelector('.header');
+    const isDark = document.documentElement.classList.contains('dark');
+    if (header) {
+        if (window.scrollY > 100) {
+            if (isDark) {
+                header.style.backgroundColor = 'rgba(31, 41, 55, 0.95)';
+            } else {
+                header.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+            }
+            header.style.backdropFilter = 'blur(10px)';
+        } else {
+            if (isDark) {
+                header.style.backgroundColor = '#1F2937';
+            } else {
+                header.style.backgroundColor = 'var(--bg-primary)';
+            }
+            header.style.backdropFilter = 'none';
+        }
+    }
+}
+
+// Set theme on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Restore theme from localStorage or system preference
+    if (
+        localStorage.getItem('theme') === 'dark' ||
+        (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    ) {
+        document.documentElement.classList.add('dark');
+        if (icon) {
+            icon.classList.remove('ri-sun-line');
+            icon.classList.add('ri-moon-line');
+        }
+    } else {
+        document.documentElement.classList.remove('dark');
+        if (icon) {
+            icon.classList.remove('ri-moon-line');
+            icon.classList.add('ri-sun-line');
+        }
+    }
+    updateHeaderColor();
+});
+
+// Toggle dark mode on click
+if (toggle && icon) {
+    toggle.addEventListener('click', function() {
+        document.documentElement.classList.toggle('dark');
+        const isDark = document.documentElement.classList.contains('dark');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        if (isDark) {
+            icon.classList.remove('ri-sun-line');
+            icon.classList.add('ri-moon-line');
+        } else {
+            icon.classList.remove('ri-moon-line');
+            icon.classList.add('ri-sun-line');
+        }
+        updateHeaderColor();
+    });
+}
+
+// Update header color on scroll
+window.addEventListener('scroll', updateHeaderColor);
+
+// ...rest of your code...
+</script>
+</body>
+</html>

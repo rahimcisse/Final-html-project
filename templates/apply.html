@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Iconnect - Browse Jobs</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script>
+tailwind.config = {
+darkMode: 'class',
+theme: {
+extend: {
+colors: {
+primary:'#3b82f6',
+secondary:'#10b981',
+dark: {
+900: '#111827',
+800: '#1F2937',
+700: '#374151',
+600: '#4B5563',
+500: '#6B7280',
+400: '#9CA3AF'
+}
+},
+borderRadius: {
+'none':'0px',
+'sm':'4px',
+DEFAULT:'8px',
+'md':'12px',
+'lg':'16px',
+'xl':'20px',
+'2xl':'24px',
+'3xl':'32px',
+'full':'9999px',
+'button':'8px'
+}
+}
+}
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+<link href='static/main.css' rel='stylesheet'>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+<style>
+          .account-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            min-width: 200px;
+            background: white;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            z-index: 100;
+        }
+        .account-dropdown.show {
+            display: block;
+        }
+        .account-dropdown a {
+            display: block;
+            padding: 12px 16px;
+            color: #4b5563;
+            transition: all 0.2s;
+        }
+        .account-dropdown a:hover {
+            background: #f3f4f6;
+            color: #1e40af;
+        }
+        .account-dropdown hr {
+            border-color: #e5e7eb;
+            margin: 4px 0;
+        }
+            .dark .account-dropdown a {
+                color: #9CA3AF;
+            }
+            
+            .dark .account-dropdown a:hover {
+                background: #374151;
+                color: #3b82f6;
+            }
+            .dark .account-dropdown hr {
+                border-color: #374151;
+            }
+            .account-dropdown hr {
+                border-color: #e5e7eb;
+                margin: 4px 0;
+            }
+                        .dark .account-dropdown {
+                background: #1F2937;
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+            }
+            /* Filter panel styles */
+            .filter-panel {
+                position: fixed;
+                top: 0;
+                right: -400px;
+                width: 400px;
+                height: 100vh;
+                background-color: white;
+                box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+                z-index: 1000;
+                transition: right 0.3s ease-in-out;
+                padding: 20px;
+                overflow-y: auto;
+            }
+            .filter-panel.open {
+                right: 0;
+            }
+            .filter-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 999;
+                display: none;
+            }
+            .filter-overlay.open {
+                display: block;
+            }
+            /* Custom select styles */
+            .custom-select {
+                position: relative;
+                display: inline-block;
+                width: 100%;
+            }
+            .custom-select select {
+                appearance: none;
+                width: 100%;
+                padding: 10px;
+                border: 1px solid #e5e7eb;
+                border-radius: 8px;
+                background-color: white;
+                cursor: pointer;
+            }
+            .custom-select::after {
+                content: '\25BC';
+                position: absolute;
+                top: 50%;
+                right: 10px;
+                transform: translateY(-50%);
+                pointer-events: none;
+            }
+</style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+    <!-- Header -->
+    <header class="bg-white dark:bg-dark-800 shadow-sm sticky top-0 z-50 transition-colors duration-200">
+        <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center">
+                <a href="#" class="text-2xl font-['Pacifico'] text-primary mr-10">Iconnect</a>
+                <nav class="hidden md:flex space-x-8">
+                    <a href="index" class="text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary font-medium">Home</a>
+                    <a href="browse" class="text-primary dark:text-primary font-medium border-b-2 border-primary">Browse Jobs</a>
+                    <a href="clients" class="text-gray-700 dark:text-gray-300 hover:text-primary font-medium">Browse Clients</a>
+                    <a href="how_it_works" class="text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary font-medium">How It Works</a>
+                    <a href="about" class="text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary font-medium">About Us</a>
+                </nav>
+            </div>
+            <div class="flex items-center space-x-4">
+                <!-- Account Button with Dropdown -->
+                <div class="relative">
+                    <button id="accountButton" class="flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:text-primary">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center text-white">
+                            <i class="ri-user-line"></i>
+                        </div>
+                        <span class="hidden md:inline font-medium">Account</span>
+                        <i class="ri-arrow-down-s-line hidden md:inline transition-transform duration-200" id="accountArrow"></i>
+                    </button>
+                    
+                    <div id="accountDropdown" class="account-dropdown">
+                        <a href="account" class="flex items-center space-x-2">
+                            <i class="ri-user-line"></i>
+                            <span>Profile</span>
+                        </a>
+                        <a href="#" class="flex items-center space-x-2">
+                            <i class="ri-settings-3-line"></i>
+                            <span>Settings</span>
+                        </a>
+                        <a href="#" class="flex items-center space-x-2">
+                            <i class="ri-mail-line"></i>
+                            <span>Messages</span>
+                        </a>
+                        <hr>
+                        <a href="login_page" class="flex items-center space-x-2 text-red-500 hover:text-red-600">
+                            <i class="ri-logout-box-r-line"></i>
+                            <span>Log Out</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 cursor-pointer" id="mobileMenuToggle">
+                    <i class="ri-menu-line ri-lg dark:text-gray-300"></i>
+                </div>
+                <div class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 cursor-pointer" id="darkModeToggle">
+                    <i class="ri-sun-line ri-lg dark:text-gray-300" id="themeIcon"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Main Search Bar -->
+
+    
+    <!-- Filter Panel -->
+    <div class="filter-overlay" id="filterOverlay"></div>
+    <div class="filter-panel" id="filterPanel">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-lg font-semibold">Filter Jobs</h3>
+            <button id="closeFilterPanel" class="text-gray-500 hover:text-gray-700">
+                <i class="ri-close-line ri-xl"></i>
+            </button>
+        </div>
+        
+        <div class="space-y-6">
+            <!-- Job Title Filter -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Job Title</label>
+                <input type="text" id="titleFilter" placeholder="Enter job title" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-primary/20 focus:outline-none">
+            </div>
+            
+            <!-- Location Filter -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Location</label>
+                <input type="text" id="locationFilter" placeholder="Enter location" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-primary/20 focus:outline-none">
+            </div>
+            
+            <!-- Job Type Filter -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Job Type</label>
+                <div class="space-y-2">
+                    <label class="flex items-center">
+                        <input type="checkbox" id="fullTimeFilter" class="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded">
+                        <span class="ml-2 text-gray-700 dark:text-gray-300">Full-time</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="checkbox" id="partTimeFilter" class="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded">
+                        <span class="ml-2 text-gray-700 dark:text-gray-300">Part-time</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="checkbox" id="contractFilter" class="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded">
+                        <span class="ml-2 text-gray-700 dark:text-gray-300">Contract</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="checkbox" id="remoteFilter" class="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded">
+                        <span class="ml-2 text-gray-700 dark:text-gray-300">Remote</span>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Salary Range Filter -->
+ 
+    </div>
+
+    <!-- Job Listings -->
+    <div class="container mx-auto px-4 py-8">
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Sidebar remains unchanged -->
+            <div class="flex-grow">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="jobContainer">
+                    <!-- Job cards will be dynamically injected here by fetch-jobs.js -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Pagination -->
+    <div class="flex justify-center mt-10 pagination">
+        <nav class="flex items-center">
+            <button class="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 mr-2">
+                <i class="ri-arrow-left-s-line"></i>
+            </button>
+            <button class="w-10 h-10 flex items-center justify-center rounded-lg bg-primary text-white mr-2">1</button>
+            <button class="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 mr-2">2</button>
+            <button class="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 mr-2">3</button>
+            <button class="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 mr-2">4</button>
+            <button class="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 mr-2">5</button>
+            <span class="mx-2 text-gray-500 dark:text-gray-400">...</span>
+            <button class="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 mr-2">12</button>
+            <button class="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800">
+                <i class="ri-arrow-right-s-line"></i>
+            </button>
+        </nav>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="bg-gray-900 text-white pt-16 pb-8 mt-16">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
+            <div class="lg:col-span-2">
+                <a href="#" class="text-2xl font-['Pacifico'] text-white mb-4 inline-block">Iconnect</a>
+                <p class="text-gray-400 mb-6 max-w-md">Connecting skilled professionals with businesses looking for quality talent. Our platform makes it easy to find work or hire the perfect candidate.</p>
+                <div class="flex space-x-4">
+                    <a href="#" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 hover:bg-primary transition-colors">
+                        <i class="ri-facebook-fill"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 hover:bg-primary transition-colors">
+                        <i class="ri-twitter-x-fill"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 hover:bg-primary transition-colors">
+                        <i class="ri-linkedin-fill"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 hover:bg-primary transition-colors">
+                        <i class="ri-instagram-fill"></i>
+                    </a>
+                </div>
+            </div>
+            <div>
+                <h4 class="text-lg font-semibold mb-4">For Workers</h4>
+                <ul class="space-y-3">
+                    <li><a href="#" class="text-gray-400 hover:text-white">Find Jobs</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white">Create Profile</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white">Career Resources</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white">Success Stories</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white">FAQ</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-lg font-semibold mb-4">For Clients</h4>
+                <ul class="space-y-3">
+                    <li><a href="#" class="text-gray-400 hover:text-white">Post a Job</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white">Browse Talent</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white">Enterprise Solutions</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white">Success Stories</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white">Resources</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-lg font-semibold mb-4">Company</h4>
+                <ul class="space-y-3">
+                    <li><a href="#" class="text-gray-400 hover:text-white">About Us</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white">Press</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white">Careers</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white">Contact</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white">Blog</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="border-t border-gray-800 pt-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <p class="text-gray-400">&copy; 2025 Iconnect. All rights reserved.</p>
+                </div>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <a href="#" class="text-gray-400 hover:text-white">Terms of Service</a>
+                    <a href="#" class="text-gray-400 hover:text-white">Privacy Policy</a>
+                    <a href="#" class="text-gray-400 hover:text-white">Cookie Policy</a>
+                    <a href="#" class="text-gray-400 hover:text-white">Accessibility</a>
+                </div>
+                <div class="mt-4 md:mt-0 flex items-center space-x-3">
+                    <i class="ri-visa-fill ri-lg"></i>
+                    <i class="ri-mastercard-fill ri-lg"></i>
+                    <i class="ri-paypal-fill ri-lg"></i>
+                    <i class="ri-apple-fill ri-lg"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+    
+    <!-- Chat Widget -->
+    <div class="fixed bottom-6 right-6 z-50">
+        <button class="w-14 h-14 flex items-center justify-center rounded-full bg-primary text-white shadow-lg hover:bg-primary/90">
+            <i class="ri-message-3-line ri-lg"></i>
+        </button>
+    </div>
+    
+    <script>
+        // JavaScript to fetch and display jobs from the backend
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('searchInput');
+            const searchButton = Array.from(document.querySelectorAll('button')).find(btn => btn.textContent.trim() === 'Search');
+            const jobContainer = document.getElementById('jobContainer');
+            
+            // Filter panel elements
+            const filtersToggle = document.getElementById('filtersToggle');
+            const filterPanel = document.getElementById('filterPanel');
+            const filterOverlay = document.getElementById('filterOverlay');
+            const closeFilterPanel = document.getElementById('closeFilterPanel');
+            const applyFilters = document.getElementById('applyFilters');
+            const resetFilters = document.getElementById('resetFilters');
+            
+            // Filter inputs
+            const titleFilter = document.getElementById('titleFilter');
+            const locationFilter = document.getElementById('locationFilter');
+            const fullTimeFilter = document.getElementById('fullTimeFilter');
+            const partTimeFilter = document.getElementById('partTimeFilter');
+            const contractFilter = document.getElementById('contractFilter');
+            const remoteFilter = document.getElementById('remoteFilter');
+            const salaryRange = document.getElementById('salaryRange');
+            const salaryValue = document.getElementById('salaryValue');
+            const experienceFilter = document.getElementById('experienceFilter');
+            
+            // Initialize salary value display
+            salaryValue.textContent = salaryRange.value >= 200000 ? '$200k+' : `$${Math.floor(salaryRange.value/1000)}k`;
+            
+            // Update salary value display when range changes
+            salaryRange.addEventListener('input', function() {
+                salaryValue.textContent = this.value >= 200000 ? '$200k+' : `$${Math.floor(this.value/1000)}k`;
+            });
+            
+            function loadJobs(query = '', filters = {}) {
+                // Build the filter query string
+                let filterQuery = '';
+                if (Object.keys(filters).length > 0) {
+                    const filterParams = new URLSearchParams();
+                    
+                    if (filters.title) filterParams.append('title', filters.title);
+                    if (filters.location) filterParams.append('location', filters.location);
+                    if (filters.jobTypes && filters.jobTypes.length > 0) {
+                        filters.jobTypes.forEach(type => filterParams.append('job_type', type));
+                    }
+                    if (filters.salaryMin) filterParams.append('salary_min', filters.salaryMin);
+                    if (filters.experience) filterParams.append('experience', filters.experience);
+                    
+                    if (filterParams.toString()) {
+                        filterQuery = filterParams.toString();
+                    }
+                }
+                
+                // Combine search query with filters
+                let finalQuery = query;
+                if (filterQuery) {
+                    finalQuery = finalQuery ? `${finalQuery}&${filterQuery}` : filterQuery;
+                }
+                
+                fetch(`/api/jobs?q=${encodeURIComponent(finalQuery)}`)
+                    .then(res => res.json())
+                    .then(jobs => {
+                        jobContainer.innerHTML = '';
+                        if (jobs.length === 0) {
+                            jobContainer.innerHTML = `
+                                <div class="col-span-full flex flex-col items-center justify-center py-12">
+                                    <i class="ri-search-line text-5xl text-gray-400 mb-4"></i>
+                                    <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">No jobs found</h3>
+                                    <p class="text-gray-500 dark:text-gray-400 text-center max-w-md">Try adjusting your search or filter criteria to find more results.</p>
+                                </div>
+                            `;
+                            return;
+                        }
+                        
+                        jobs.forEach(job => {
+                            const card = document.createElement('div');
+                            card.className = 'bg-white dark:bg-dark-800 rounded-lg shadow-sm hover:shadow-md transition-shadow p-6';
+                            card.innerHTML = `
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="flex items-center">
+                                        <div class="w-12 h-12 flex items-center justify-center bg-blue-100 rounded-lg mr-4">
+                                            <i class="ri-briefcase-line ri-lg text-blue-600"></i>
+                                        </div>
+                                        <div>
+                                            <h3 class="font-semibold text-gray-900 dark:text-white">${job.title}</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex flex-wrap gap-2 mb-4">
+                                    ${(job.skills || '').split(',').map(skill => `
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">${skill.trim()}</span>
+                                    `).join('')}
+                                </div>
+                                <div class="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400 mb-4">
+                                    <div class="flex items-center">
+                                        <i class="ri-map-pin-line mr-1"></i><span>${job.location}</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="ri-time-line mr-1"></i><span>available</span>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <span class="font-semibold text-gray-900 dark:text-white">${job.job_type}</span>
+                                    </div>
+                                    <button onclick="window.location.href = 'apply';" class="px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 whitespace-nowrap !rounded-button">Apply Now</button>
+                                </div>
+                            `;
+                            jobContainer.appendChild(card);
+                        });
+                    });
+            }
+            
+            // Load jobs on page load
+            loadJobs();
+            
+            // Search on button click
+            searchButton.addEventListener('click', () => {
+                loadJobs(searchInput.value);
+            });
+            
+            // Search on Enter key
+            searchInput.addEventListener('keydown', e => {
+                if (e.key === 'Enter') loadJobs(searchInput.value);
+            });
+            
+            // NEW: Search on any key press with debounce
+            let searchTimeout;
+            searchInput.addEventListener('input', function() {
+                // Clear previous timeout to prevent multiple rapid searches
+                clearTimeout(searchTimeout);
+                
+                // Set a new timeout to wait for user to stop typing
+                searchTimeout = setTimeout(() => {
+                    loadJobs(this.value);
+                }, 300); // 300ms delay to avoid excessive API calls
+            });
+            
+            // Filter panel toggle
+            filtersToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                filterPanel.classList.add('open');
+                filterOverlay.classList.add('open');
+                document.body.style.overflow = 'hidden'; // Prevent scrolling when panel is open
+            });
+            
+            // Close filter panel
+            function closeFilterPanelHandler() {
+                filterPanel.classList.remove('open');
+                filterOverlay.classList.remove('open');
+                document.body.style.overflow = ''; // Restore scrolling
+            }
+            
+            closeFilterPanel.addEventListener('click', closeFilterPanelHandler);
+            filterOverlay.addEventListener('click', closeFilterPanelHandler);
+            
+            // Apply filters
+            applyFilters.addEventListener('click', function() {
+                const filters = {
+                    title: titleFilter.value,
+                    location: locationFilter.value,
+                    jobTypes: []
+                };
+                
+
+                
+                // Add experience filter
+                if (experienceFilter.value) {
+                    filters.experience = experienceFilter.value;
+                }
+                
+                // Apply filters and close panel
+                loadJobs(searchInput.value, filters);
+                closeFilterPanelHandler();
+            });
+            
+            // Reset filters
+            resetFilters.addEventListener('click', function() {
+                // Reset all filter inputs to default values
+                titleFilter.value = '';
+                locationFilter.value = '';
+                fullTimeFilter.checked = false;
+                partTimeFilter.checked = false;
+                contractFilter.checked = false;
+                remoteFilter.checked = false;
+
+                experienceFilter.value = '';
+                
+                // Reload jobs without filters
+                loadJobs(searchInput.value);
+            });
+        });
+        
+        // Dark mode functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('darkModeToggle');
+            const icon = document.getElementById('themeIcon');
+            
+            if (localStorage.getItem('theme') === 'dark') {
+                document.documentElement.classList.add('dark');
+                icon.classList.remove('ri-sun-line');
+                icon.classList.add('ri-moon-line');
+            }
+            
+            toggle.addEventListener('click', () => {
+                document.documentElement.classList.toggle('dark');
+                const isDark = document.documentElement.classList.contains('dark');
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                icon.classList.toggle('ri-sun-line');
+                icon.classList.toggle('ri-moon-line');
+            });
+        });
+        
+        // Mobile menu toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const mobileNav = document.querySelector('nav');
+            
+            if (mobileMenuToggle && mobileNav) {
+                mobileMenuToggle.addEventListener('click', function() {
+                    mobileNav.classList.toggle('hidden');
+                });
+            }
+        });
+        
+        // Account dropdown
+        document.addEventListener('DOMContentLoaded', function() {
+            const accountButton = document.getElementById('accountButton');
+            const accountDropdown = document.getElementById('accountDropdown');
+            const accountArrow = document.getElementById('accountArrow');
+            
+            if (accountButton && accountDropdown) {
+                accountButton.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    accountDropdown.classList.toggle('show');
+                    
+                    // Rotate arrow icon
+                    if (accountArrow) {
+                        accountArrow.classList.toggle('rotate-180');
+                    }
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!accountButton.contains(e.target) && !accountDropdown.contains(e.target)) {
+                        accountDropdown.classList.remove('show');
+                        if (accountArrow) {
+                            accountArrow.classList.remove('rotate-180');
+                        }
+                    }
+                });
+                
+                // Close dropdown when clicking on a dropdown item
+                const dropdownItems = accountDropdown.querySelectorAll('a');
+                dropdownItems.forEach(item => {
+                    item.addEventListener('click', function() {
+                        accountDropdown.classList.remove('show');
+                        if (accountArrow) {
+                            accountArrow.classList.remove('rotate-180');
+                        }
+                    });
+                });
+            }
+        });
+        
+    </script>
+</body>
+</html>

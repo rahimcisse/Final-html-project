@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Applications - Iconnect</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<link rel="stylesheet" href="/static/main.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    .application-card {
+        border-left: 4px solid #3b82f6;
+        transition: all 0.3s ease;
+    }
+    .application-card:hover {
+        background-color: #f8fafc;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+</style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white dark:bg-gray-800 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-4">
+                    <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Job Applications</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/client-dashboard" class="text-blue-600 hover:text-blue-800 font-medium">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
+                    </a>
+                    <a href="/dashboard" class="text-gray-600 hover:text-gray-800">Profile</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Search Section -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow mb-6 p-6">
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">View Applications by Job</h2>
+            
+            <div class="flex flex-col sm:flex-row gap-4">
+                <div class="flex-1">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Job ID</label>
+                    <input id="jobIdInput" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                           placeholder="Enter job ID to view applications">
+                </div>
+                <div class="flex items-end">
+                    <button id="loadApps" 
+                            class="w-full sm:w-auto bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition font-medium">
+                        <i class="fas fa-search mr-2"></i>Load Applications
+                    </button>
+                </div>
+            </div>
+
+            <div class="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-md">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-info-circle text-blue-600 mt-0.5"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-blue-800 dark:text-blue-300">
+                            <strong>Tip:</strong> You can find job IDs in your <a href="/client-dashboard" class="underline hover:text-blue-600">Client Dashboard</a>. 
+                            Each job you've posted has a unique ID number.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Applications List -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Applications</h3>
+            </div>
+            
+            <div class="p-6">
+                <div id="applicationsList">
+                    <div class="text-center py-12">
+                        <i class="fas fa-users text-4xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                        <p class="text-gray-500 dark:text-gray-400 text-lg mb-2">Ready to view applications</p>
+                        <p class="text-gray-400 dark:text-gray-500">Enter a job ID above and click "Load Applications" to see who has applied.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cover Letter Modal -->
+    <div id="coverLetterModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Cover Letter</h3>
+                        <button onclick="closeCoverLetterModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="mb-4">
+                        <h4 id="modalApplicantName" class="font-semibold text-gray-900 dark:text-white text-lg"></h4>
+                        <p id="modalJobTitle" class="text-gray-600 dark:text-gray-400 text-sm"></p>
+                    </div>
+                    <div class="prose dark:prose-invert max-w-none">
+                        <div id="modalCoverLetter" class="bg-gray-50 dark:bg-gray-700 p-4 rounded-md whitespace-pre-wrap"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentJobTitle = '';
+
+        document.getElementById('loadApps').addEventListener('click', loadApplications);
+        
+        // Load applications when Enter is pressed in the input field
+        document.getElementById('jobIdInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                loadApplications();
+            }
+        });
+
+        async function loadApplications() {
+            const jobId = document.getElementById('jobIdInput').value.trim();
+            if (!jobId) {
+                alert('Please enter a job ID');
+                return;
+            }
+
+            const container = document.getElementById('applicationsList');
+            
+            // Show loading state
+            container.innerHTML = `
+                <div class="text-center py-8">
+                    <i class="fas fa-spinner fa-spin text-2xl text-blue-600 mb-4"></i>
+                    <p class="text-gray-600 dark:text-gray-400">Loading applications...</p>
+                </div>
+            `;
+
+            try {
+                // First, get job details to check if it exists and belongs to the user
+                const jobResponse = await fetch(`/api/my-jobs/${jobId}/applications`);
+                
+                if (!jobResponse.ok) {
+                    if (jobResponse.status === 404) {
+                        throw new Error('Job not found or you don\'t have permission to view its applications');
+                    }
+                    throw new Error('Failed to load applications');
+                }
+
+                const data = await jobResponse.json();
+                currentJobTitle = data.job_title;
+                const applications = data.applications;
+
+                if (!applications || applications.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center py-12">
+                            <i class="fas fa-inbox text-4xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                            <p class="text-gray-500 dark:text-gray-400 text-lg mb-2">No applications yet</p>
+                            <p class="text-gray-400 dark:text-gray-500">No one has applied for "${currentJobTitle}" yet.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = `
+                    <div class="mb-6">
+                        <h4 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Applications for: ${currentJobTitle}</h4>
+                        <p class="text-gray-600 dark:text-gray-400">${applications.length} ${applications.length === 1 ? 'application' : 'applications'} received</p>
+                    </div>
+                    <div class="space-y-4">
+                        ${applications.map(app => `
+                            <div class="application-card bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-6">
+                                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                                    <div class="flex-1 mb-4 lg:mb-0">
+                                        <div class="flex items-center mb-3">
+                                            <div class="bg-blue-100 dark:bg-blue-900/30 p-2 rounded-full mr-3">
+                                                <i class="fas fa-user text-blue-600 dark:text-blue-400"></i>
+                                            </div>
+                                            <div>
+                                                <h5 class="font-semibold text-gray-900 dark:text-white text-lg">${app.applicant_name}</h5>
+                                                <p class="text-gray-600 dark:text-gray-400 flex items-center">
+                                                    <i class="fas fa-envelope mr-2"></i>${app.applicant_email}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-4">
+                                            <i class="fas fa-calendar mr-2"></i>
+                                            Applied on: ${formatDate(app.created_at)}
+                                        </div>
+
+                                        ${app.cover_letter ? `
+                                            <div class="bg-gray-50 dark:bg-gray-600 p-3 rounded-md mb-4">
+                                                <p class="text-sm text-gray-700 dark:text-gray-300 line-clamp-3">
+                                                    ${app.cover_letter.substring(0, 150)}${app.cover_letter.length > 150 ? '...' : ''}
+                                                </p>
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                    
+                                    <div class="flex flex-col sm:flex-row gap-3 lg:ml-6">
+                                        ${app.resume_path ? `
+                                            <a href="/uploads/${app.resume_path}" target="_blank" 
+                                               class="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition">
+                                                <i class="fas fa-download mr-2"></i>Download Resume
+                                            </a>
+                                        ` : `
+                                            <span class="inline-flex items-center justify-center px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-500 dark:text-gray-400 text-sm font-medium rounded-md">
+                                                <i class="fas fa-file-times mr-2"></i>No Resume
+                                            </span>
+                                        `}
+                                        
+                                        <button onclick="showCoverLetter('${app.applicant_name}', '${(app.cover_letter || 'No cover letter provided').replace(/'/g, "\\'")}', '${currentJobTitle}')"
+                                                class="inline-flex items-center justify-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 transition">
+                                            <i class="fas fa-file-alt mr-2"></i>View Cover Letter
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+
+            } catch (error) {
+                console.error('Error loading applications:', error);
+                container.innerHTML = `
+                    <div class="text-center py-12">
+                        <i class="fas fa-exclamation-triangle text-4xl text-red-400 mb-4"></i>
+                        <p class="text-red-600 dark:text-red-400 text-lg mb-2">Error loading applications</p>
+                        <p class="text-gray-500 dark:text-gray-400">${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function showCoverLetter(applicantName, coverLetter, jobTitle) {
+            document.getElementById('modalApplicantName').textContent = applicantName;
+            document.getElementById('modalJobTitle').textContent = `Application for: ${jobTitle}`;
+            document.getElementById('modalCoverLetter').textContent = coverLetter;
+            document.getElementById('coverLetterModal').classList.remove('hidden');
+        }
+
+        function closeCoverLetterModal() {
+            document.getElementById('coverLetterModal').classList.add('hidden');
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('coverLetterModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeCoverLetterModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeCoverLetterModal();
+            }
+        });
+    </script>
+</body>
+</html>

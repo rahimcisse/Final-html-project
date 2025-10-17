@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - IConnect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href='static/main.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="max-w-3xl mx-auto p-6">
+        <header class="flex items-center justify-between mb-6">
+            <h1 class="text-2xl font-bold">Dashboard</h1>
+            <a href="/logout" class="text-sm text-blue-600 hover:underline">Logout</a>
+        </header>
+
+        <section class="bg-white p-6 rounded shadow">
+            <h2 class="text-lg font-semibold mb-4">Your account</h2>
+            <div class="space-y-3">
+                <div>
+                    <div class="text-sm text-gray-500">Name</div>
+                    <div id="fullName" class="text-base font-medium">—</div>
+                </div>
+                <div>
+                    <div class="text-sm text-gray-500">Email</div>
+                    <div id="email" class="text-base font-medium">—</div>
+                </div>
+                <div>
+                    <div class="text-sm text-gray-500">Role</div>
+                    <div id="role" class="text-base font-medium text-purple-600">—</div>
+                </div>
+            </div>
+        </section>
+
+        <div id="error" class="mt-4 text-red-500 hidden"></div>
+    </div>
+
+<script>
+async function loadUser() {
+    try {
+        const res = await fetch('/get_user');
+        if (!res.ok) {
+            if (res.status === 401) {
+                document.getElementById('error').textContent = 'You are not logged in. Redirecting to login...';
+                document.getElementById('error').classList.remove('hidden');
+                setTimeout(() => window.location.href = '/login_page', 1500);
+                return;
+            }
+            throw new Error('Failed to fetch user');
+        }
+        const data = await res.json();
+        document.getElementById('fullName').textContent = data.full_name || '—';
+        document.getElementById('email').textContent = data.email || '—';
+        document.getElementById('role').textContent = data.role || '—';
+    } catch (err) {
+        console.error(err);
+        document.getElementById('error').textContent = 'Unable to load user data.';
+        document.getElementById('error').classList.remove('hidden');
+    }
+}
+
+window.addEventListener('DOMContentLoaded', loadUser);
+</script>
+</body>
+</html>

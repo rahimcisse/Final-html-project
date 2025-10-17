@@ -1,0 +1,16 @@
+{
+  "name": "iconnect-help-support",
+  "version": "1.0.0",
+  "description": "Help and support page for iConnect platform",
+  "main": "index.html",
+  "scripts": {
+    "dev": "http-server . -p 3000 -o",
+    "start": "http-server . -p 3000"
+  },
+  "keywords": ["iconnect", "help", "support", "html", "css", "javascript"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}

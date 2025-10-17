@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Data - IConnect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen p-8">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8">Debug Dashboard</h1>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Debug Actions -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h2 class="text-xl font-semibold mb-4">Debug Actions</h2>
+                <div class="space-y-3">
+                    <button onclick="checkUserStatus()" class="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                        Check User Status
+                    </button>
+                    <button onclick="debugJobs()" class="w-full bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                        Debug All Jobs
+                    </button>
+                    <button onclick="debugApplications()" class="w-full bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">
+                        Debug All Applications
+                    </button>
+                    <button onclick="debugMyData()" class="w-full bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700">
+                        Debug My Data
+                    </button>
+                    <button onclick="fixJobOwnership()" class="w-full bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                        Fix Job Ownership
+                    </button>
+                    <button onclick="fixApplications()" class="w-full bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700">
+                        Fix Applications
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Results -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h2 class="text-xl font-semibold mb-4">Results</h2>
+                <div id="results" class="bg-gray-50 p-4 rounded text-sm overflow-auto max-h-96">
+                    Click a button to see results...
+                </div>
+            </div>
+        </div>
+        
+        <!-- Detailed Results -->
+        <div class="mt-8 bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold mb-4">Detailed Results</h2>
+            <pre id="detailResults" class="bg-gray-50 p-4 rounded text-xs overflow-auto max-h-96">
+                Detailed results will appear here...
+            </pre>
+        </div>
+    </div>
+
+    <script>
+        function showResult(message, data = null) {
+            document.getElementById('results').innerHTML = message;
+            if (data) {
+                document.getElementById('detailResults').textContent = JSON.stringify(data, null, 2);
+            }
+        }
+
+        async function checkUserStatus() {
+            try {
+                const response = await fetch('/get_user');
+                const data = await response.json();
+                if (response.ok) {
+                    showResult(`✅ User logged in: ${data.full_name} (ID: will check)`, data);
+                } else {
+                    showResult(`❌ User not logged in: ${data.error}`, data);
+                }
+            } catch (error) {
+                showResult(`❌ Error: ${error.message}`);
+            }
+        }
+
+        async function debugJobs() {
+            try {
+                const response = await fetch('/debug/jobs');
+                const data = await response.json();
+                showResult(`📝 Found ${data.length} jobs in database`, data);
+            } catch (error) {
+                showResult(`❌ Error: ${error.message}`);
+            }
+        }
+
+        async function debugApplications() {
+            try {
+                const response = await fetch('/debug/applications');
+                const data = await response.json();
+                showResult(`📋 Found ${data.length} applications in database`, data);
+            } catch (error) {
+                showResult(`❌ Error: ${error.message}`);
+            }
+        }
+
+        async function debugMyData() {
+            try {
+                const response = await fetch('/debug/my-data');
+                const data = await response.json();
+                if (response.ok) {
+                    showResult(`👤 My data: ${data.my_jobs.length} jobs, ${data.applications_for_my_jobs.length} applications`, data);
+                } else {
+                    showResult(`❌ Error: ${data.error}`, data);
+                }
+            } catch (error) {
+                showResult(`❌ Error: ${error.message}`);
+            }
+        }
+
+        async function fixJobOwnership() {
+            try {
+                const response = await fetch('/migrate/fix-job-ownership');
+                const data = await response.json();
+                if (response.ok) {
+                    showResult(`🔧 ${data.message}`, data);
+                } else {
+                    showResult(`❌ Error: ${data.error}`, data);
+                }
+            } catch (error) {
+                showResult(`❌ Error: ${error.message}`);
+            }
+        }
+
+        async function fixApplications() {
+            try {
+                const response = await fetch('/migrate/fix-applications');
+                const data = await response.json();
+                if (response.ok) {
+                    showResult(`🔧 ${data.message}`, data);
+                } else {
+                    showResult(`❌ Error: ${data.error}`, data);
+                }
+            } catch (error) {
+                showResult(`❌ Error: ${error.message}`);
+            }
+        }
+
+        // Auto-check user status on load
+        window.addEventListener('DOMContentLoaded', checkUserStatus);
+    </script>
+</body>
+</html>

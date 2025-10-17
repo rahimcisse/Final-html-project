@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Dashboard - IConnect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href='static/main.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .job-card {
+            transition: all 0.3s ease;
+        }
+        .job-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .application-card {
+            border-left: 4px solid #3b82f6;
+        }
+        .application-card:hover {
+            background-color: #f8fafc;
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .badge-primary {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        .badge-success {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold text-gray-900">Client Dashboard</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span id="welcomeText" class="text-gray-600">Welcome!</span>
+                    <a href="/dashboard" class="text-blue-600 hover:underline">Profile</a>
+                    <a href="/logout" class="text-red-600 hover:underline">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                        <i class="fas fa-briefcase text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Total Jobs Posted</p>
+                        <p id="totalJobs" class="text-2xl font-semibold text-gray-900">0</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-green-100 text-green-600">
+                        <i class="fas fa-users text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Total Applications</p>
+                        <p id="totalApplications" class="text-2xl font-semibold text-gray-900">0</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                        <i class="fas fa-chart-line text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Avg. Applications per Job</p>
+                        <p id="avgApplications" class="text-2xl font-semibold text-gray-900">0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Posted Jobs -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-lg font-semibold text-gray-900">Your Posted Jobs</h2>
+                        <a href="/addClient" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">
+                            <i class="fas fa-plus mr-2"></i>Post New Job
+                        </a>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div id="jobsList" class="space-y-4">
+                        <!-- Jobs will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Applications -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-900">Recent Applications</h2>
+                </div>
+                <div class="p-6">
+                    <div id="recentApplicationsList" class="space-y-4">
+                        <!-- Recent applications will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Details Modal -->
+    <div id="applicationModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-gray-900">Applications for: <span id="modalJobTitle"></span></h3>
+                        <button onclick="closeApplicationModal()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div id="modalApplicationsList" class="space-y-4">
+                        <!-- Applications will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let allJobs = [];
+        let allApplications = [];
+
+        // Load user info and data on page load
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadUser();
+            await loadJobs();
+            await loadRecentApplications();
+            updateStats();
+        });
+
+        async function loadUser() {
+            try {
+                const response = await fetch('/get_user');
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        window.location.href = '/login_page';
+                        return;
+                    }
+                    throw new Error('Failed to fetch user');
+                }
+                currentUser = await response.json();
+                document.getElementById('welcomeText').textContent = `Welcome, ${currentUser.full_name}!`;
+            } catch (error) {
+                console.error('Error loading user:', error);
+                window.location.href = '/login_page';
+            }
+        }
+
+        async function loadJobs() {
+            try {
+                const response = await fetch('/api/my-jobs');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch jobs');
+                }
+                allJobs = await response.json();
+                displayJobs();
+            } catch (error) {
+                console.error('Error loading jobs:', error);
+                document.getElementById('jobsList').innerHTML = '<p class="text-gray-500">Failed to load jobs.</p>';
+            }
+        }
+
+        function displayJobs() {
+            const jobsList = document.getElementById('jobsList');
+            
+            if (allJobs.length === 0) {
+                jobsList.innerHTML = `
+                    <div class="text-center py-8">
+                        <i class="fas fa-briefcase text-4xl text-gray-300 mb-4"></i>
+                        <p class="text-gray-500 mb-4">You haven't posted any jobs yet.</p>
+                        <a href="/addClient" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition">
+                            Post Your First Job
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+
+            jobsList.innerHTML = allJobs.map(job => `
+                <div class="job-card border border-gray-200 rounded-lg p-4 cursor-pointer" onclick="viewApplications(${job.id}, '${job.title}')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <h3 class="font-semibold text-gray-900 mb-1">${job.title}</h3>
+                            <p class="text-sm text-gray-600 mb-2">${job.location} • ${job.job_type}</p>
+                            <p class="text-sm text-gray-500 line-clamp-2">${job.description || 'No description provided'}</p>
+                        </div>
+                        <div class="ml-4 text-right">
+                            <span class="badge badge-primary">Click to view applications</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function loadRecentApplications() {
+            try {
+                allApplications = [];
+                for (const job of allJobs) {
+                    const response = await fetch(`/api/my-jobs/${job.id}/applications`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        allApplications.push(...data.applications.map(app => ({
+                            ...app,
+                            job_title: job.title,
+                            job_id: job.id
+                        })));
+                    }
+                }
+                
+                // Sort by created_at (most recent first)
+                allApplications.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                displayRecentApplications();
+            } catch (error) {
+                console.error('Error loading applications:', error);
+            }
+        }
+
+        function displayRecentApplications() {
+            const recentList = document.getElementById('recentApplicationsList');
+            const recentApps = allApplications.slice(0, 5); // Show only recent 5
+
+            if (recentApps.length === 0) {
+                recentList.innerHTML = '<p class="text-gray-500 text-center py-4">No applications yet.</p>';
+                return;
+            }
+
+            recentList.innerHTML = recentApps.map(app => `
+                <div class="application-card border border-gray-200 rounded-lg p-4">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-gray-900">${app.applicant_name}</h4>
+                            <p class="text-sm text-gray-600">${app.applicant_email}</p>
+                            <p class="text-xs text-gray-500 mt-1">Applied for: ${app.job_title}</p>
+                            <p class="text-xs text-gray-400">${formatDate(app.created_at)}</p>
+                        </div>
+                        <div class="flex space-x-2 ml-4">
+                            ${app.resume_path ? `<a href="/uploads/${app.resume_path}" target="_blank" class="text-blue-600 hover:text-blue-800" title="Download Resume"><i class="fas fa-download"></i></a>` : ''}
+                            <button onclick="showCoverLetter('${app.applicant_name}', '${(app.cover_letter || 'No cover letter provided').replace(/'/g, "\\'")}', '${app.job_title}')" class="text-green-600 hover:text-green-800" title="View Cover Letter">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function viewApplications(jobId, jobTitle) {
+            try {
+                const response = await fetch(`/api/my-jobs/${jobId}/applications`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch applications');
+                }
+                
+                const data = await response.json();
+                document.getElementById('modalJobTitle').textContent = jobTitle;
+                
+                const modalList = document.getElementById('modalApplicationsList');
+                
+                if (data.applications.length === 0) {
+                    modalList.innerHTML = '<p class="text-gray-500 text-center py-8">No applications for this job yet.</p>';
+                } else {
+                    modalList.innerHTML = data.applications.map(app => `
+                        <div class="application-card border border-gray-200 rounded-lg p-4">
+                            <div class="flex justify-between items-start">
+                                <div class="flex-1">
+                                    <h4 class="font-semibold text-gray-900 mb-2">${app.applicant_name}</h4>
+                                    <p class="text-sm text-gray-600 mb-1"><i class="fas fa-envelope mr-2"></i>${app.applicant_email}</p>
+                                    <p class="text-xs text-gray-500 mb-3"><i class="fas fa-calendar mr-2"></i>Applied on: ${formatDate(app.created_at)}</p>
+                                    
+                                    <div class="flex flex-wrap gap-2">
+                                        ${app.resume_path ? `
+                                            <a href="/uploads/${app.resume_path}" target="_blank" 
+                                               class="inline-flex items-center px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition">
+                                                <i class="fas fa-download mr-2"></i>Download Resume
+                                            </a>
+                                        ` : ''}
+                                        
+                                        <button onclick="showCoverLetter('${app.applicant_name}', '${(app.cover_letter || 'No cover letter provided').replace(/'/g, "\\'")}', '${jobTitle}')"
+                                                class="inline-flex items-center px-3 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition">
+                                            <i class="fas fa-file-alt mr-2"></i>View Cover Letter
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+                
+                document.getElementById('applicationModal').classList.remove('hidden');
+            } catch (error) {
+                console.error('Error loading applications:', error);
+                alert('Failed to load applications for this job.');
+            }
+        }
+
+        function closeApplicationModal() {
+            document.getElementById('applicationModal').classList.add('hidden');
+        }
+
+        function showCoverLetter(applicantName, coverLetter, jobTitle) {
+            alert(`Cover Letter from ${applicantName} for "${jobTitle}":\n\n${coverLetter}`);
+        }
+
+        function updateStats() {
+            document.getElementById('totalJobs').textContent = allJobs.length;
+            document.getElementById('totalApplications').textContent = allApplications.length;
+            
+            const avgApps = allJobs.length > 0 ? (allApplications.length / allJobs.length).toFixed(1) : '0';
+            document.getElementById('avgApplications').textContent = avgApps;
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Function to refresh all data
+        async function refreshData() {
+            console.log('Refreshing dashboard data...');
+            await loadJobs();
+            await loadRecentApplications();
+            updateStats();
+        }
+
+        // Auto-refresh when window gains focus (after returning from another page)
+        window.addEventListener('focus', refreshData);
+
+        // Add a visible refresh button
+        window.addEventListener('DOMContentLoaded', () => {
+            // Add refresh button to header
+            const headerActions = document.querySelector('header .flex.items-center.space-x-4');
+            if (headerActions) {
+                const refreshBtn = document.createElement('button');
+                refreshBtn.innerHTML = '<i class="fas fa-sync-alt mr-2"></i>Refresh';
+                refreshBtn.className = 'text-green-600 hover:underline';
+                refreshBtn.onclick = refreshData;
+                headerActions.insertBefore(refreshBtn, headerActions.firstChild);
+            }
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('applicationModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeApplicationModal();
+            }
+        });
+    </script>
+</body>
+</html>

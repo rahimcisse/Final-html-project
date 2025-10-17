@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Job - IConnect</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+<link href='static/main.css' rel='stylesheet'>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+
+<script> 
+tailwind.config = {
+darkMode: 'class',
+theme: {
+extend: {
+colors: {
+primary:'#3b82f6',
+secondary:'#10b981',
+dark: {
+900: '#111827',
+800: '#1F2937',
+700: '#374151',
+600: '#4B5563',
+500: '#6B7280',
+400: '#9CA3AF'
+}
+},
+borderRadius: {
+'none':'0px',
+'sm':'4px',
+DEFAULT:'8px',
+'md':'12px',
+'lg':'16px',
+'xl':'20px',
+'2xl':'24px',
+'3xl':'32px',
+'full':'9999px',
+'button':'8px'
+}
+}
+}
+}
+</script>
+<style>
+          .account-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            min-width: 200px;
+            background: white;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            z-index: 100;
+            margin-top: 8px;
+        }
+        
+        .dark .account-dropdown {
+            background: #1F2937;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+        }
+        
+        .account-dropdown.show {
+            display: block;
+        }
+        
+        .account-dropdown a {
+            display: block;
+            padding: 12px 16px;
+            color: #4b5563;
+            transition: all 0.2s;
+        }
+        
+        .dark .account-dropdown a {
+            color: #9CA3AF;
+        }
+        
+        .account-dropdown a:hover {
+            background: #f3f4f6;
+            color: #1e40af;
+        }
+        
+        .dark .account-dropdown a:hover {
+            background: #374151;
+            color: #3b82f6;
+        }
+        
+        .account-dropdown hr {
+            border-color: #e5e7eb;
+            margin: 4px 0;
+        }
+        
+        .dark .account-dropdown hr {
+            border-color: #374151;
+        }
+        
+        .account-dropdown .text-red-500:hover {
+            color: #ef4444 !important;
+        }
+        
+        .dark .account-dropdown .text-red-500:hover {
+            color: #f87171 !important;
+        }
+</style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+    <header class="bg-white dark:bg-dark-800 shadow-sm sticky top-0 z-50 transition-colors duration-200">
+        <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center">
+                <a href="#" class="text-2xl font-['Pacifico'] text-primary mr-10">Iconnect</a>
+                <nav class="hidden md:flex space-x-8">
+                    <a href="index" class="text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary font-medium">Home</a>
+                    <a href="browse" class="text-primary dark:text-primary font-medium border-b-2 border-primary">Browse Jobs</a>
+                    <a href="how_it_works" class="text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary font-medium">How It Works</a>
+                    <a href="about" class="text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary font-medium">About Us</a>
+                </nav>
+            </div>
+            <div class="flex items-center space-x-4">
+
+                <!-- Account Button with Dropdown -->
+                <div class="relative">
+                    <button id="accountButton" class="flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:text-primary">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center text-white">
+                            <i class="ri-user-line"></i>
+                        </div>
+                        <span class="hidden md:inline font-medium">Account</span>
+                        <i class="ri-arrow-down-s-line hidden md:inline transition-transform duration-200" id="accountArrow"></i>
+                    </button>
+                    
+                    <div id="accountDropdown" class="account-dropdown">
+                        <a href="account" class="flex items-center space-x-2">
+                            <i class="ri-user-line"></i>
+                            <span>Profile</span>
+                        </a>
+                        <a href="#" class="flex items-center space-x-2">
+                            <i class="ri-settings-3-line"></i>
+                            <span>Settings</span>
+                        </a>
+                        <a href="#" class="flex items-center space-x-2">
+                            <i class="ri-mail-line"></i>
+                            <span>Messages</span>
+                        </a>
+                        <hr>
+                        <a href="login_page" class="flex items-center space-x-2 text-red-500 hover:text-red-600">
+                            <i class="ri-logout-box-r-line"></i>
+                            <span>Log Out</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 cursor-pointer" id="mobileMenuToggle">
+                    <i class="ri-menu-line ri-lg dark:text-gray-300"></i>
+                </div>
+                <div class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 cursor-pointer" id="darkModeToggle">
+                    <i class="ri-sun-line ri-lg dark:text-gray-300" id="themeIcon"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+  <div class="container mx-auto px-4 py-10 max-w-lg">
+    <h1 class="text-2xl font-bold mb-6">Add a Job</h1>
+    <form id="addJobForm" class="space-y-4">
+      <div>
+        <label for="title" class="block mb-1 font-medium">Company Name</label>
+        <input type="text" id="title" name="title" required class="w-full px-4 py-2 border rounded-md dark:bg-dark-800">
+      </div>
+      <div>
+        <label for="job_type" class="block mb-1 font-medium">Job Type</label>
+        <input type="text" id="job_type" name="job_type" required class="w-full px-4 py-2 border rounded-md dark:bg-dark-800">
+      </div>
+      <div>
+        <label for="company_email" class="block mb-1 font-medium">Company email or Phone Number</label>
+        <input type="text" id="company_email" name="company_email" required class="w-full px-4 py-2 border rounded-md dark:bg-dark-800">
+      </div>
+      
+
+      <div>
+        <label for="location" class="block mb-1 font-medium">Location</label>
+        <input type="text" id="location" name="location" required class="w-full px-4 py-2 border rounded-md dark:bg-dark-800">
+      </div>
+      <div>
+        <label for="salary" class="block mb-1 font-medium">Salary</label>
+        <input type="text" id="salary" name="salary" required class="w-full px-4 py-2 border rounded-md dark:bg-dark-800">
+      </div>
+      
+      <div>
+        <label for="duration" class="block mb-1 font-medium">Job Duration</label>
+        <input type="text" id="duration" name="duration" required class="w-full px-4 py-2 border rounded-md dark:bg-dark-800">
+      </div>
+      <div>
+        <label for="experience" class="block mb-1 font-medium">Experience Level</label>
+        <input type="text" id="experience" name="experience" required class="w-full px-4 py-2 border rounded-md dark:bg-dark-800">
+      </div>
+      <div>
+        <label for="description" class="block mb-1 font-medium">Job Description</label>
+        <textarea id="description" name="description" rows="3" class="w-full px-4 py-2 border rounded-md dark:bg-dark-800"></textarea>
+      </div>
+      <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700">Add Job</button>
+    </form>
+    <div id="result" class="mt-4 text-green-600 font-semibold hidden">Job added successfully!</div>
+  </div>
+
+  <script>
+      // Dark mode functionality
+        const toggle = document.getElementById('darkModeToggle');
+        const icon = document.getElementById('themeIcon');
+
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+            icon.classList.remove('ri-sun-line');
+            icon.classList.add('ri-moon-line');
+        }
+
+        toggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            icon.classList.toggle('ri-sun-line');
+            icon.classList.toggle('ri-moon-line');
+        });
+    document.getElementById('addJobForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const data = {
+        title: document.getElementById('title').value,
+        company_email: document.getElementById('company_email').value,
+        salary: document.getElementById('salary').value,
+        duration: document.getElementById('duration').value,
+        experience: document.getElementById('experience').value,
+        location: document.getElementById('location').value,
+        job_type: document.getElementById('job_type').value,
+        description: document.getElementById('description').value
+      };
+
+      fetch('/api/jobs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      })
+      .then(res => res.json())
+      .then(response => {
+        if (response.status === 'success') {
+          document.getElementById('result').classList.remove('hidden');
+          document.getElementById('addJobForm').reset();
+        }
+      })
+      .catch(err => console.error(err));
+    });
+      // Dropdown functionality
+  const dropdownToggles = [
+    {toggle: 'categoryDropdown', content: 'categoryOptions'},
+    {toggle: 'sortDropdown', content: 'sortOptions'},
+    {toggle: 'perPageDropdown', content: 'perPageOptions'}
+  ];
+  
+  dropdownToggles.forEach(item => {
+    const toggle = document.getElementById(item.toggle);
+    const content = document.getElementById(item.content);
+    
+    if (toggle && content) {
+      toggle.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const parent = this.parentElement;
+        
+        // Close all other dropdowns
+        document.querySelectorAll('.dropdown').forEach(el => {
+          if (el !== parent) {
+            el.classList.remove('active');
+          }
+        });
+        
+        // Toggle current dropdown
+        parent.classList.toggle('active');
+      });
+      
+      // Handle dropdown item selection
+      const dropdownItems = content.querySelectorAll('a');
+      dropdownItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+          e.preventDefault();
+          const text = this.textContent.trim();
+          const toggleText = toggle.querySelector('span');
+          if (toggleText) {
+            toggleText.textContent = text;
+          }
+          toggle.parentElement.classList.remove('active');
+        });
+      });
+    }
+  });
+  
+  // Close dropdowns when clicking outside
+  document.addEventListener('click', function(e) {
+    document.querySelectorAll('.dropdown').forEach(dropdown => {
+      if (!dropdown.contains(e.target)) {
+        dropdown.classList.remove('active');
+      }
+    });
+  });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const accountButton = document.getElementById('accountButton');
+            const accountDropdown = document.getElementById('accountDropdown');
+            const accountArrow = document.getElementById('accountArrow');
+            
+            if (accountButton && accountDropdown) {
+                accountButton.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    accountDropdown.classList.toggle('show');
+                    
+                    // Rotate arrow icon
+                    if (accountArrow) {
+                        accountArrow.classList.toggle('rotate-180');
+                    }
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!accountButton.contains(e.target) && !accountDropdown.contains(e.target)) {
+                        accountDropdown.classList.remove('show');
+                        if (accountArrow) {
+                            accountArrow.classList.remove('rotate-180');
+                        }
+                    }
+                });
+                
+                // Close dropdown when clicking on a dropdown item
+                const dropdownItems = accountDropdown.querySelectorAll('a');
+                dropdownItems.forEach(item => {
+                    item.addEventListener('click', function() {
+                        accountDropdown.classList.remove('show');
+                        if (accountArrow) {
+                            accountArrow.classList.remove('rotate-180');
+                        }
+                    });
+                });
+            }})
+       
+  </script>
+  
+</body>
+</html>
