@@ -124,23 +124,66 @@ def add_worker():
 @app.route('/api/jobs', methods=['GET'])
 def get_jobs():
     query = request.args.get('q', '').strip()
+    user_id = session.get('user_id')
+    
     mydatabase = sqlite3.connect('clients.db')
     database = mydatabase.cursor()
+    
+    # Get all active (non-deleted) jobs
     if query:
         database.execute('''SELECT * FROM jobs WHERE 
-                        title LIKE ? OR 
+                        (title LIKE ? OR 
                         location LIKE ? OR 
                         job_type LIKE ? OR 
                         description LIKE ? OR 
                         company_email LIKE ? OR 
                         salary LIKE ? OR 
                         duration LIKE ? OR 
-                        experience LIKE ?''',
+                        experience LIKE ?) AND 
+                        (deleted IS NULL OR deleted = 0)''',
                   tuple([f"%{query}%"] * 8))
     else:
-        database.execute('SELECT * FROM jobs')
+        database.execute('SELECT * FROM jobs WHERE deleted IS NULL OR deleted = 0')
+    
+    active_jobs = database.fetchall()
+    
+    # If user is logged in, also get deleted jobs they have applied to
+    user_applied_deleted_jobs = []
+    if user_id:
+        # Get job IDs the user has applied to
+        conn = sqlite3.connect('applications.db')
+        c = conn.cursor()
+        c.execute('SELECT DISTINCT job_id FROM applications WHERE user_id = ?', (user_id,))
+        applied_job_ids = [row[0] for row in c.fetchall()]
+        conn.close()
+        
+        if applied_job_ids:
+            # Get deleted jobs from the applied list
+            placeholders = ','.join(['?'] * len(applied_job_ids))
+            if query:
+                database.execute(f'''SELECT * FROM jobs WHERE 
+                                id IN ({placeholders}) AND deleted = 1 AND
+                                (title LIKE ? OR 
+                                location LIKE ? OR 
+                                job_type LIKE ? OR 
+                                description LIKE ? OR 
+                                company_email LIKE ? OR 
+                                salary LIKE ? OR 
+                                duration LIKE ? OR 
+                                experience LIKE ?)''',
+                          applied_job_ids + [f"%{query}%"] * 8)
+            else:
+                database.execute(f'SELECT * FROM jobs WHERE id IN ({placeholders}) AND deleted = 1', applied_job_ids)
+            
+            user_applied_deleted_jobs = database.fetchall()
+    
+    mydatabase.close()
+    
+    # Combine active jobs and user's applied deleted jobs
+    all_jobs = active_jobs + user_applied_deleted_jobs
+    
     jobs = []
-    for row in database.fetchall():
+    for row in all_jobs:
         job = dict(id=row[0], title=row[1], company_email=row[2], location=row[3], 
                   salary=row[4], duration=row[5], experience=row[6], 
                   job_type=row[7], description=row[8])
@@ -150,13 +193,24 @@ def get_jobs():
             job['company_description'] = row[10] if len(row) > 10 else ''
             job['company_website'] = row[11] if len(row) > 11 else ''
             job['posted_by_user_id'] = row[12] if len(row) > 12 else None
+            job['deleted'] = row[13] if len(row) > 13 else 0
         except Exception:
             job['company_name'] = ''
             job['company_description'] = ''
             job['company_website'] = ''
             job['posted_by_user_id'] = None
+            job['deleted'] = 0
+        
+        # Add status information
+        if job['deleted'] == 1:
+            job['status'] = 'unavailable'
+            job['status_message'] = 'This job is no longer available'
+        else:
+            job['status'] = 'available'
+            job['status_message'] = 'Open for applications'
+        
         jobs.append(job)
-    mydatabase.close()
+    
     return jsonify(jobs)
 
 @app.route('/api/jobs', methods=['POST'])
@@ -183,7 +237,7 @@ def add_job():
 def get_job(job_id):
     mydatabase = sqlite3.connect('clients.db')
     database = mydatabase.cursor()
-    database.execute('SELECT * FROM jobs WHERE id = ?', (job_id,))
+    database.execute('SELECT * FROM jobs WHERE id = ? AND (deleted IS NULL OR deleted = 0)', (job_id,))
     row = database.fetchone()
     mydatabase.close()
     if not row:
@@ -242,6 +296,22 @@ def init_applications_db():
                 conn.close()
             except Exception:
                 pass
+        
+        # Add user_id column to track which user applied
+        try:
+            conn = sqlite3.connect('applications.db')
+            c = conn.cursor()
+            c.execute('ALTER TABLE applications ADD COLUMN user_id INTEGER')
+            conn.commit()
+            print("User_id column added successfully")
+        except Exception as e:
+            # column probably already exists
+            print(f"User_id column may already exist: {e}")
+        finally:
+            try:
+                conn.close()
+            except Exception:
+                pass
     except Exception as e:
         print(f"Error initializing applications database: {e}")
 
@@ -251,6 +321,20 @@ init_applications_db()
 # Endpoint to submit application for a job
 @app.route('/api/jobs/<int:job_id>/apply', methods=['POST'])
 def apply_job(job_id):
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'error': 'Must be logged in to apply'}), 401
+    
+    # Check if user has already applied to this job
+    conn = sqlite3.connect('applications.db')
+    c = conn.cursor()
+    c.execute('SELECT id FROM applications WHERE job_id = ? AND user_id = ?', (job_id, user_id))
+    existing_application = c.fetchone()
+    conn.close()
+    
+    if existing_application:
+        return jsonify({'error': 'You have already applied to this job'}), 400
+    
     # Support JSON or multipart/form-data with file upload
     name = None
     email = None
@@ -284,24 +368,132 @@ def apply_job(job_id):
     if not name or not email:
         return jsonify({'error': 'Name and email are required'}), 400
 
-    # Check job exists
+    # Check job exists and is not deleted
     mydatabase = sqlite3.connect('clients.db')
     database = mydatabase.cursor()
-    database.execute('SELECT id FROM jobs WHERE id = ?', (job_id,))
+    database.execute('SELECT id FROM jobs WHERE id = ? AND (deleted IS NULL OR deleted = 0)', (job_id,))
     if not database.fetchone():
         mydatabase.close()
-        return jsonify({'error': 'Job not found'}), 404
+        return jsonify({'error': 'Job not found or no longer available'}), 404
     mydatabase.close()
 
-    # Save application
+    # Save application with user_id
     conn = sqlite3.connect('applications.db')
     c = conn.cursor()
-    c.execute('''INSERT INTO applications (job_id, applicant_name, applicant_email, cover_letter, resume_text, resume_path)
-                 VALUES (?, ?, ?, ?, ?, ?)''', (job_id, name, email, cover_letter, resume_text, resume_path))
+    c.execute('''INSERT INTO applications (job_id, applicant_name, applicant_email, cover_letter, resume_text, resume_path, user_id)
+                 VALUES (?, ?, ?, ?, ?, ?, ?)''', (job_id, name, email, cover_letter, resume_text, resume_path, user_id))
     conn.commit()
     conn.close()
 
     return jsonify({'message': 'Application submitted successfully'})
+
+
+# Check if current user has already applied to a job
+@app.route('/api/jobs/<int:job_id>/check-application', methods=['GET'])
+def check_user_application(job_id):
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'applied': False, 'message': 'Not logged in'})
+    
+    # Check if user has already applied to this job
+    conn = sqlite3.connect('applications.db')
+    c = conn.cursor()
+    c.execute('SELECT id FROM applications WHERE job_id = ? AND user_id = ?', (job_id, user_id))
+    existing_application = c.fetchone()
+    conn.close()
+    
+    return jsonify({
+        'applied': existing_application is not None,
+        'message': 'Already applied' if existing_application else 'Can apply'
+    })
+
+
+# Delete application for a specific job by the logged-in user
+@app.route('/api/jobs/<int:job_id>/application', methods=['DELETE'])
+def delete_application(job_id):
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'error': 'Must be logged in'}), 401
+    
+    # Check if user has an application for this job
+    conn = sqlite3.connect('applications.db')
+    c = conn.cursor()
+    c.execute('SELECT id FROM applications WHERE job_id = ? AND user_id = ?', (job_id, user_id))
+    application = c.fetchone()
+    
+    if not application:
+        conn.close()
+        return jsonify({'error': 'Application not found'}), 404
+    
+    # Delete the application
+    c.execute('DELETE FROM applications WHERE job_id = ? AND user_id = ?', (job_id, user_id))
+    conn.commit()
+    conn.close()
+    
+    return jsonify({
+        'message': 'Application deleted successfully',
+        'job_id': job_id
+    })
+
+
+# Get all jobs that the current user has applied to (including deleted ones)
+@app.route('/api/my-applications', methods=['GET'])
+def get_my_applications():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'error': 'Not logged in'}), 401
+    
+    # Get all job IDs that the user has applied to
+    conn = sqlite3.connect('applications.db')
+    c = conn.cursor()
+    c.execute('SELECT DISTINCT job_id, created_at FROM applications WHERE user_id = ? ORDER BY created_at DESC', (user_id,))
+    applied_jobs = c.fetchall()
+    conn.close()
+    
+    if not applied_jobs:
+        return jsonify([])
+    
+    # Get job details for all applied jobs (including deleted ones)
+    job_ids = [str(job[0]) for job in applied_jobs]
+    placeholders = ','.join(['?'] * len(job_ids))
+    
+    mydatabase = sqlite3.connect('clients.db')
+    database = mydatabase.cursor()
+    database.execute(f'SELECT * FROM jobs WHERE id IN ({placeholders})', job_ids)
+    jobs_data = database.fetchall()
+    mydatabase.close()
+    
+    # Create a lookup for application dates
+    application_dates = {job[0]: job[1] for job in applied_jobs}
+    
+    jobs = []
+    for row in jobs_data:
+        job = dict(id=row[0], title=row[1], company_email=row[2], location=row[3], 
+                  salary=row[4], duration=row[5], experience=row[6], 
+                  job_type=row[7], description=row[8])
+        
+        # Add optional company fields safely
+        try:
+            job['company_name'] = row[9] if len(row) > 9 else ''
+            job['company_description'] = row[10] if len(row) > 10 else ''
+            job['company_website'] = row[11] if len(row) > 11 else ''
+            job['posted_by_user_id'] = row[12] if len(row) > 12 else None
+            job['deleted'] = row[13] if len(row) > 13 else 0
+        except Exception:
+            job['company_name'] = ''
+            job['company_description'] = ''
+            job['company_website'] = ''
+            job['posted_by_user_id'] = None
+            job['deleted'] = 0
+        
+        # Add application status information
+        job['applied_at'] = application_dates.get(job['id'], '')
+        job['status'] = 'unavailable' if job['deleted'] == 1 else 'available'
+        job['already_applied'] = True
+        
+        jobs.append(job)
+    
+    return jsonify(jobs)
 
 
 @app.route('/api/jobs/<int:job_id>/applications', methods=['GET'])
@@ -333,7 +525,7 @@ def get_my_jobs():
     
     mydatabase = sqlite3.connect('clients.db')
     database = mydatabase.cursor()
-    database.execute('SELECT * FROM jobs WHERE posted_by_user_id = ? ORDER BY id DESC', (user_id,))
+    database.execute('SELECT * FROM jobs WHERE posted_by_user_id = ? AND (deleted IS NULL OR deleted = 0) ORDER BY id DESC', (user_id,))
     rows = database.fetchall()
     mydatabase.close()
     
@@ -370,10 +562,10 @@ def get_my_job_applications(job_id):
     if not user_id:
         return jsonify({'error': 'Not logged in'}), 401
     
-    # First check if this job belongs to the logged-in user
+    # First check if this job belongs to the logged-in user and is not deleted
     mydatabase = sqlite3.connect('clients.db')
     database = mydatabase.cursor()
-    database.execute('SELECT id, title FROM jobs WHERE id = ? AND posted_by_user_id = ?', (job_id, user_id))
+    database.execute('SELECT id, title FROM jobs WHERE id = ? AND posted_by_user_id = ? AND (deleted IS NULL OR deleted = 0)', (job_id, user_id))
     job = database.fetchone()
     mydatabase.close()
     
@@ -404,6 +596,49 @@ def get_my_job_applications(job_id):
         'applications': applications
     })
 
+# Delete job and all its applications
+@app.route('/api/my-jobs/<int:job_id>', methods=['DELETE'])
+def delete_job(job_id):
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'error': 'Not logged in'}), 401
+    
+    # First check if this job belongs to the logged-in user
+    mydatabase = sqlite3.connect('clients.db')
+    database = mydatabase.cursor()
+    database.execute('SELECT id, title, deleted FROM jobs WHERE id = ? AND posted_by_user_id = ?', (job_id, user_id))
+    job = database.fetchone()
+    
+    if not job:
+        mydatabase.close()
+        return jsonify({'error': 'Job not found or not authorized'}), 404
+    
+    # Check if job is already deleted
+    if job[2] == 1:  # deleted column value
+        mydatabase.close()
+        return jsonify({'error': 'Job is already deleted'}), 400
+    
+    job_title = job[1]
+    
+    # Count applications for this job (for information purposes)
+    conn = sqlite3.connect('applications.db')
+    c = conn.cursor()
+    c.execute('SELECT COUNT(*) FROM applications WHERE job_id = ?', (job_id,))
+    applications_count = c.fetchone()[0]
+    conn.close()
+    
+    # Mark the job as deleted instead of actually deleting it
+    database.execute('UPDATE jobs SET deleted = 1 WHERE id = ?', (job_id,))
+    mydatabase.commit()
+    mydatabase.close()
+    
+    return jsonify({
+        'message': f'Job "{job_title}" has been marked as deleted. {applications_count} applications are preserved.',
+        'deleted_job_id': job_id,
+        'applications_count': applications_count,
+        'note': 'Job data and applications are preserved in the database but hidden from public view'
+    })
+
 
 @app.route('/uploads/<path:filename>')
 def uploaded_file(filename):
@@ -418,6 +653,13 @@ def applications_page():
         # allow access for now; in real app restrict to employers
         pass
     return render_template('applications.html')
+
+@app.route('/my-applications')
+def my_applications_page():
+    # Page for job seekers to view their application history
+    if 'user_id' not in session:
+        return redirect('/login_page')
+    return render_template('my_applications.html')
 
 
 def init_db2():
@@ -452,6 +694,10 @@ def init_db2():
         pass
     try:
         database.execute("ALTER TABLE jobs ADD COLUMN posted_by_user_id INTEGER")
+    except Exception:
+        pass
+    try:
+        database.execute("ALTER TABLE jobs ADD COLUMN deleted INTEGER DEFAULT 0")
     except Exception:
         pass
     
@@ -732,6 +978,8 @@ def debug_jobs():
         'id': job[0], 
         'title': job[1], 
         'posted_by_user_id': job[12] if len(job) > 12 else 'NULL',
+        'deleted': job[13] if len(job) > 13 else 'NULL',
+        'status': 'DELETED' if (len(job) > 13 and job[13] == 1) else 'ACTIVE',
         'all_fields': job
     } for job in jobs])
 
@@ -746,6 +994,8 @@ def debug_applications():
         'id': app[0],
         'job_id': app[1],
         'applicant_name': app[2],
+        'applicant_email': app[3],
+        'user_id': app[8] if len(app) > 8 else 'NULL',
         'all_fields': app
     } for app in apps])
 
@@ -755,7 +1005,7 @@ def debug_my_data():
     if not user_id:
         return jsonify({'error': 'Not logged in'}), 401
     
-    # Get my jobs
+    # Get my jobs (including deleted ones for debug purposes)
     mydatabase = sqlite3.connect('clients.db')
     database = mydatabase.cursor()
     database.execute('SELECT * FROM jobs WHERE posted_by_user_id = ?', (user_id,))
@@ -775,9 +1025,33 @@ def debug_my_data():
     
     return jsonify({
         'user_id': user_id,
-        'my_jobs': [{'id': job[0], 'title': job[1], 'posted_by_user_id': job[12] if len(job) > 12 else 'NULL'} for job in my_jobs],
+        'my_jobs': [{
+            'id': job[0], 
+            'title': job[1], 
+            'posted_by_user_id': job[12] if len(job) > 12 else 'NULL',
+            'deleted': job[13] if len(job) > 13 else 'NULL',
+            'status': 'DELETED' if (len(job) > 13 and job[13] == 1) else 'ACTIVE'
+        } for job in my_jobs],
         'applications_for_my_jobs': [{'id': app[0], 'job_id': app[1], 'applicant_name': app[2]} for app in apps_data]
     })
+
+# Debug route to view only deleted jobs
+@app.route('/debug/deleted-jobs')
+def debug_deleted_jobs():
+    mydatabase = sqlite3.connect('clients.db')
+    database = mydatabase.cursor()
+    database.execute('SELECT * FROM jobs WHERE deleted = 1')
+    jobs = database.fetchall()
+    mydatabase.close()
+    return jsonify([{
+        'id': job[0], 
+        'title': job[1], 
+        'company_email': job[2],
+        'location': job[3],
+        'posted_by_user_id': job[12] if len(job) > 12 else 'NULL',
+        'deleted': job[13] if len(job) > 13 else 'NULL',
+        'status': 'DELETED'
+    } for job in jobs])
 
 # Migration route to fix existing jobs without posted_by_user_id
 @app.route('/migrate/fix-job-ownership')
@@ -851,7 +1125,6 @@ def migrate_applications():
         'message': f'Updated {len(updated_apps)} applications to use job IDs',
         'updated_applications': updated_apps
     })
-
 
 def init_db3():
     conn = sqlite3.connect('messages.db')
@@ -972,9 +1245,6 @@ def reset_password():
     db.session.commit()
     otp_store.pop(email, None)
     return jsonify({'message': 'Password reset successful'})
-
-
-
 
 
 

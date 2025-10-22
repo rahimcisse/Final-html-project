@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Iconnect - Browse clients</title>
 <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='icon.ico') }}">
 <script>
 tailwind.config = {
 darkMode: 'class',
@@ -145,9 +146,135 @@ DEFAULT:'8px',
                 transform: translateY(-50%);
                 pointer-events: none;
             }
+            
+            /* Modal Styles */
+            .modal-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 1000;
+                animation: fadeIn 0.3s ease;
+            }
+            
+            .modal-overlay.show {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .modal-content {
+                background: white;
+                border-radius: 12px;
+                padding: 24px;
+                max-width: 500px;
+                width: 90%;
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+                animation: slideUp 0.3s ease;
+            }
+            
+            .dark .modal-content {
+                background: #1F2937;
+            }
+            
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            
+            @keyframes slideUp {
+                from {
+                    transform: translateY(20px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+            
+            /* Toast Notification Styles */
+            .toast {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: white;
+                border-radius: 8px;
+                padding: 16px 20px;
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                z-index: 2000;
+                animation: slideInRight 0.3s ease;
+                max-width: 400px;
+            }
+            
+            .dark .toast {
+                background: #1F2937;
+            }
+            
+            .toast.success {
+                border-left: 4px solid #10b981;
+            }
+            
+            .toast.error {
+                border-left: 4px solid #ef4444;
+            }
+            
+            .toast.warning {
+                border-left: 4px solid #f59e0b;
+            }
+            
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            
+            @keyframes slideOutRight {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
 </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="flex items-start mb-4">
+                <div class="flex-shrink-0 bg-red-100 dark:bg-red-900/20 rounded-full p-3">
+                    <i class="fas fa-exclamation-triangle text-red-600 dark:text-red-400 text-xl"></i>
+                </div>
+                <div class="ml-4 flex-1">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2" id="modalTitle">Confirm Action</h3>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm" id="modalMessage">Are you sure?</p>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6">
+                <button onclick="closeModal()" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 font-medium transition-colors">
+                    Cancel
+                </button>
+                <button id="confirmButton" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium transition-colors">
+                    Confirm
+                </button>
+            </div>
+        </div>
+    </div>
     <!-- Header -->
     <header class="bg-white dark:bg-dark-800 shadow-sm sticky top-0 z-50 transition-colors duration-200">
         <div class="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -155,6 +282,8 @@ DEFAULT:'8px',
                 <a href="#" class="text-2xl font-['Pacifico'] text-primary mr-10">Iconnect</a>
                 <nav class="hidden md:flex space-x-8">
                     <a href="index" class="text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary font-medium">Home</a>
+                    <a href="client-dashboard" data-role-only="Client" class="text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary font-medium">Dashboard</a>
+                    <a href="my-applications" data-role-only="Job Seeker" class="text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary font-medium">Applications</a>
                     <a href="browse" data-role-only="Client" class="text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary font-medium">Browse Workers</a>
                     <a href="clients" data-role-only="Job Seeker" class="text-primary dark:text-primary font-medium border-b-2 border-primary">Browse Clients</a>
                     <a href="how_it_works" class="text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary font-medium">How It Works</a>
@@ -176,6 +305,10 @@ DEFAULT:'8px',
                         <a href="account" class="flex items-center space-x-2">
                             <i class="ri-user-line"></i>
                             <span>Profile</span>
+                        </a>
+                        <a href="my-applications" data-role-only="Job Seeker" class="flex items-center space-x-2">
+                            <i class="ri-file-list-2-line"></i>
+                            <span>My Applications</span>
                         </a>
                         <a href="#" class="flex items-center space-x-2">
                             <i class="ri-settings-3-line"></i>
@@ -498,7 +631,13 @@ DEFAULT:'8px',
                         
                         clients.forEach(clients => {
                             const card = document.createElement('div');
-                            card.className = 'bg-white dark:bg-dark-800 rounded-lg shadow-sm hover:shadow-md transition-shadow p-6';
+                            // Add different styling for unavailable jobs
+                            const isUnavailable = clients.status === 'unavailable';
+                            const cardClass = isUnavailable 
+                                ? 'bg-gray-100 dark:bg-gray-700 rounded-lg shadow-sm border-2 border-red-200 dark:border-red-800 p-6 opacity-75'
+                                : 'bg-white dark:bg-dark-800 rounded-lg shadow-sm hover:shadow-md transition-shadow p-6';
+                            
+                            card.className = cardClass;
                             card.innerHTML = `
                                 <div class="flex justify-between items-start mb-4">
                                     <div class="flex items-center">
@@ -507,8 +646,10 @@ DEFAULT:'8px',
                                         </div>
                                         <div>
                                             <h3 class="font-semibold text-gray-900 dark:text-white">${clients.title}</h3>
+                                            ${isUnavailable ? '<span class="text-sm text-red-600 dark:text-red-400 font-medium">• Job No Longer Available</span>' : ''}
                                         </div>
                                     </div>
+                                    ${isUnavailable ? '<div class="bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 px-3 py-1 rounded-full text-xs font-medium">Unavailable</div>' : ''}
                                 </div>
                                 <div class="flex flex-wrap gap-2 mb-4">
                                     ${(clients.skills || '').split(',').map(skill => `
@@ -520,7 +661,7 @@ DEFAULT:'8px',
                                         <i class="ri-map-pin-line mr-1"></i><span>${clients.location}</span>
                                     </div>
                                     <div class="flex items-center">
-                                        <i class="ri-time-line mr-1"></i><span>available</span>
+                                        <i class="ri-time-line mr-1"></i><span>${isUnavailable ? 'unavailable' : 'available'}</span>
                                     </div>
                                 </div>
                                 <div class="flex justify-between items-center">
@@ -529,26 +670,63 @@ DEFAULT:'8px',
                                     </div>
                                     <div class="flex space-x-2">
                                         <button data-client-id="${clients.id}" class="view-client-details px-4 py-2 border border-primary text-primary rounded-lg font-medium hover:bg-primary/10">View Details</button>
-                                        <button data-client-id="${clients.id}" data-client-title="${clients.title}" class="apply-client px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary/90">Apply Now</button>
+                                        ${isUnavailable 
+                                            ? '<button class="px-4 py-2 bg-gray-400 text-gray-200 rounded-lg font-medium cursor-not-allowed" disabled>Already Applied</button>'
+                                            : '<button data-client-id="' + clients.id + '" data-client-title="' + clients.title + '" class="apply-client px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary/90">Apply Now</button>'
+                                        }
                                     </div>
                                 </div>
                             `;
                             clientsContainer.appendChild(card);
+                            
+                            // Only check application status for available jobs
+                            if (!isUnavailable) {
+                                // Check application status and update button accordingly
+                                const applyBtn = card.querySelector('.apply-client');
+                                if (applyBtn) {
+                                    fetch(`/api/jobs/${clients.id}/check-application`)
+                                        .then(r => r.json())
+                                        .then(result => {
+                                            if (result.applied) {
+                                                applyBtn.disabled = true;
+                                                applyBtn.textContent = 'Already Applied';
+                                                applyBtn.className = 'apply-client px-4 py-2 bg-gray-400 text-gray-200 rounded-lg font-medium cursor-not-allowed';
+                                                applyBtn.removeAttribute('data-client-id');
+                                                applyBtn.removeAttribute('data-client-title');
+                                            }
+                                        })
+                                        .catch(err => {
+                                            // If check fails, leave button as is (user not logged in or other error)
+                                            console.log('Application check failed:', err);
+                                        });
+                                }
+                            }
+                            
                             // attach handlers
                             const viewBtn = card.querySelector('.view-client-details');
-                            const applyBtn = card.querySelector('.apply-client');
                             if (viewBtn) {
                                 viewBtn.addEventListener('click', () => {
                                     const id = viewBtn.getAttribute('data-client-id');
                                     fetch(`/api/jobs/${id}`)
                                         .then(r => r.json())
                                         .then(detail => {
-                                            if (detail && !detail.error) showClientDetails(detail);
+                                            if (detail && !detail.error) {
+                                                // Add status information to the detail view
+                                                detail.status = clients.status;
+                                                detail.status_message = clients.status_message;
+                                                showClientDetails(detail);
+                                            }
                                         }).catch(err => console.error(err));
                                 });
                             }
-                            if (applyBtn) {
+                            
+                            const applyBtn = card.querySelector('.apply-client');
+                            if (applyBtn && !isUnavailable) {
                                 applyBtn.addEventListener('click', () => {
+                                    // Check if button is disabled
+                                    if (applyBtn.disabled) {
+                                        return;
+                                    }
                                     const id = applyBtn.getAttribute('data-client-id');
                                     const title = applyBtn.getAttribute('data-client-title');
                                     openClientApplyModal(id, title);
@@ -638,6 +816,65 @@ DEFAULT:'8px',
             });
         });
         
+            // Modal and Toast Functions
+            let confirmCallback = null;
+            
+            function showModal(title, message, onConfirm) {
+                document.getElementById('modalTitle').textContent = title;
+                document.getElementById('modalMessage').textContent = message;
+                confirmCallback = onConfirm;
+                document.getElementById('confirmModal').classList.add('show');
+            }
+            
+            function closeModal() {
+                document.getElementById('confirmModal').classList.remove('show');
+                confirmCallback = null;
+            }
+            
+            document.getElementById('confirmButton').addEventListener('click', function() {
+                if (confirmCallback) {
+                    confirmCallback();
+                    confirmCallback = null;
+                }
+                closeModal();
+            });
+            
+            // Close modal when clicking outside
+            document.getElementById('confirmModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal();
+                }
+            });
+            
+            function showToast(message, type = 'success') {
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                
+                let icon;
+                if (type === 'success') {
+                    icon = '<i class="fas fa-check-circle text-green-600 dark:text-green-400 text-xl"></i>';
+                } else if (type === 'warning') {
+                    icon = '<i class="fas fa-exclamation-triangle text-yellow-600 dark:text-yellow-400 text-xl"></i>';
+                } else {
+                    icon = '<i class="fas fa-exclamation-circle text-red-600 dark:text-red-400 text-xl"></i>';
+                }
+                
+                toast.innerHTML = `
+                    ${icon}
+                    <span class="text-gray-900 dark:text-white font-medium">${message}</span>
+                    <button onclick="this.parentElement.remove()" class="ml-auto text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.style.animation = 'slideOutRight 0.3s ease';
+                    setTimeout(() => toast.remove(), 300);
+                }, 5000);
+            }
+        
             // --- Client Details & Apply Modals ---
             function createClientModals() {
                 // Details modal
@@ -724,16 +961,43 @@ DEFAULT:'8px',
                     const email = document.getElementById('clientApplicantEmail').value.trim();
                     const cover = document.getElementById('clientApplicantCover').value.trim();
                     const resumeFile = document.getElementById('clientApplicantResume').files[0];
-                    if (!name || !email) { alert('Name and email are required'); return; }
+                    
+                    if (!name || !email) { 
+                        showToast('Name and email are required', 'warning'); 
+                        return; 
+                    }
+                    
                     const fd = new FormData();
                     fd.append('name', name);
                     fd.append('email', email);
                     fd.append('cover_letter', cover);
                     if (resumeFile) fd.append('resume', resumeFile);
+                    
                     fetch(`/api/jobs/${id}/apply`, { method: 'POST', body: fd })
                         .then(r => r.json())
-                        .then(resp => { if (resp.error) alert(resp.error); else { alert(resp.message || 'Application submitted'); toggleClientModal('clientApplyModal', false); } })
-                        .catch(err => { console.error(err); alert('Failed to submit application'); });
+                        .then(resp => { 
+                            if (resp.error) {
+                                showToast(resp.error, 'error'); 
+                            } else { 
+                                showToast(resp.message || 'Application submitted successfully!', 'success'); 
+                                toggleClientModal('clientApplyModal', false);
+                                // Update the apply button for this job to show "Already Applied"
+                                const applyBtns = document.querySelectorAll(`[data-client-id="${id}"]`);
+                                applyBtns.forEach(btn => {
+                                    if (btn.classList.contains('apply-client')) {
+                                        btn.disabled = true;
+                                        btn.textContent = 'Already Applied';
+                                        btn.className = 'apply-client px-4 py-2 bg-gray-400 text-gray-200 rounded-lg font-medium cursor-not-allowed';
+                                        btn.removeAttribute('data-client-id');
+                                        btn.removeAttribute('data-client-title');
+                                    }
+                                });
+                            } 
+                        })
+                        .catch(err => { 
+                            console.error(err); 
+                            showToast('Failed to submit application', 'error'); 
+                        });
                 });
             }
 
@@ -762,6 +1026,40 @@ DEFAULT:'8px',
                 }
                 document.getElementById('clientDetailsDescription').innerHTML = detail.description || '';
                 document.getElementById('clientApplyId').value = detail.id || '';
+                
+                // Check application status and update button
+                const applyBtn = document.getElementById('clientDetailsApplyBtn');
+                const isUnavailable = detail.status === 'unavailable';
+                
+                if (isUnavailable) {
+                    // Job is unavailable/deleted
+                    applyBtn.disabled = true;
+                    applyBtn.textContent = 'Job No Longer Available';
+                    applyBtn.className = 'px-4 py-2 bg-gray-400 text-gray-200 rounded-lg font-medium cursor-not-allowed';
+                } else {
+                    // Check if user has already applied
+                    fetch(`/api/jobs/${detail.id}/check-application`)
+                        .then(r => r.json())
+                        .then(result => {
+                            if (result.applied) {
+                                applyBtn.disabled = true;
+                                applyBtn.textContent = 'Already Applied';
+                                applyBtn.className = 'px-4 py-2 bg-gray-400 text-gray-200 rounded-lg font-medium cursor-not-allowed';
+                            } else {
+                                applyBtn.disabled = false;
+                                applyBtn.textContent = 'Apply';
+                                applyBtn.className = 'apply-client-btn px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary/90';
+                            }
+                        })
+                        .catch(err => {
+                            console.log('Application check failed:', err);
+                            // Default to allowing apply if check fails
+                            applyBtn.disabled = false;
+                            applyBtn.textContent = 'Apply';
+                            applyBtn.className = 'apply-client-btn px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary/90';
+                        });
+                }
+                
                 toggleClientModal('clientDetailsModal', true);
             }
 

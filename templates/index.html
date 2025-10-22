@@ -13,6 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
     <link href='static/main.css' rel='stylesheet'>
+        <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='icon.ico') }}">
     <style>
         :where([class^="ri-"])::before { content: "\f3c2"; }
         body {
@@ -230,10 +231,82 @@
                 background: #1F2937;
                 box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
             }
+            
+            /* Modal Styles */
+            .modal-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 1000;
+                animation: fadeIn 0.3s ease;
+            }
+            
+            .modal-overlay.show {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .modal-content {
+                background: white;
+                border-radius: 12px;
+                padding: 24px;
+                max-width: 500px;
+                width: 90%;
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+                animation: slideUp 0.3s ease;
+            }
+            
+            .dark .modal-content {
+                background: #1F2937;
+            }
+            
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            
+            @keyframes slideUp {
+                from {
+                    transform: translateY(20px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
     </style>
 </head>
 
     <body class="bg-gray-50 dark:bg-gray-900 font-['Inter'] transition-colors duration-300" id="body">
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="flex items-start mb-4">
+                <div class="flex-shrink-0 bg-red-100 dark:bg-red-900/20 rounded-full p-3">
+                    <i class="ri-alert-line text-red-600 dark:text-red-400 text-xl"></i>
+                </div>
+                <div class="ml-4 flex-1">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2" id="modalTitle">Confirm Action</h3>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm" id="modalMessage">Are you sure?</p>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6">
+                <button onclick="closeModal()" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 font-medium transition-colors">
+                    Cancel
+                </button>
+                <button id="confirmButton" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium transition-colors">
+                    Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+    
     <!-- Header -->
     <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50">
         <div class="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -241,11 +314,12 @@
                 <a href="#" class="text-2xl font-['Pacifico'] text-primary mr-10">Iconnect</a>
                 <nav class="hidden md:flex space-x-8">
                     <a href="index" class="text-primary dark:text-primary font-medium border-b-2 border-primary">Home</a>
-                    <a href="client-dashboard" class="text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary font-medium">Dashboard</a>
-                    <a href="browse" data-role-only="Client" class="text-gray-700 dark:text-gray-300 hover:text-primary font-medium">Browse Workers</a>
-                    <a href="clients" data-role-only="Job Seeker" class="text-gray-700 dark:text-gray-300 hover:text-primary font-medium">Browse Clients</a>
-                    <a href="how_it_works" class="text-gray-700 dark:text-gray-300 hover:text-primary font-medium">How It Works</a>
-                    <a href="about" class="text-gray-700 dark:text-gray-300 hover:text-primary font-medium">About Us</a>
+                    <a href="client-dashboard" data-role-only="Client" class="text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary font-medium">Dashboard</a>
+                    <a href="my-applications" data-role-only="Job Seeker" class="text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary font-medium">Applications</a>
+                    <a href="browse" data-role-only="Client" class="text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary font-medium">Browse Workers</a>
+                    <a href="clients" data-role-only="Job Seeker" class="text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary font-medium">Browse Clients</a>
+                    <a href="how_it_works" class="text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary font-medium">How It Works</a>
+                    <a href="about" class="text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary font-medium">About Us</a>
                 </nav>
             </div>
             <div class="flex items-center space-x-4">
@@ -265,16 +339,24 @@
                             <i class="ri-user-line"></i>
                             <span>Profile</span>
                         </a>
-                        <a href="client-dashboard" class="flex items-center space-x-2">
+                        <a href="client-dashboard" data-role-only="Client" class="flex items-center space-x-2">
+                            <i class="ri-file-list-2-line"></i>
+                            <span>My Dashboard</span>
+                        </a>
+                        <a href="my-applications" data-role-only="Job Seeker" class="flex items-center space-x-2">
+                            <i class="ri-file-list-2-line"></i>
+                            <span>My Applications</span>
+                        </a>
+                        <a href="#" class="flex items-center space-x-2">
                             <i class="ri-settings-3-line"></i>
-                            <span>Dashboard</span>
+                            <span>Settings</span>
                         </a>
                         <a href="#" class="flex items-center space-x-2">
                             <i class="ri-mail-line"></i>
                             <span>Messages</span>
                         </a>
                         <hr>
-                        <a href="login_page" class="flex items-center space-x-2 text-red-500 hover:text-red-600">
+                        <a href="#" onclick="logout()" class="flex items-center space-x-2 text-red-500 hover:text-red-600">
                             <i class="ri-logout-box-r-line"></i>
                             <span>Log Out</span>
                         </a>
@@ -1046,6 +1128,46 @@
                 accountDropdown.classList.remove('show');
             }
         });
+        
+        // Modal and Logout Functions
+        let confirmCallback = null;
+        
+        function showModal(title, message, onConfirm) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalMessage').textContent = message;
+            confirmCallback = onConfirm;
+            document.getElementById('confirmModal').classList.add('show');
+        }
+        
+        function closeModal() {
+            document.getElementById('confirmModal').classList.remove('show');
+            confirmCallback = null;
+        }
+        
+        document.getElementById('confirmButton').addEventListener('click', function() {
+            if (confirmCallback) {
+                confirmCallback();
+                confirmCallback = null;
+            }
+            closeModal();
+        });
+        
+        // Close modal when clicking outside
+        document.getElementById('confirmModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+        
+        function logout() {
+            showModal(
+                'Confirm Logout',
+                'Are you sure you want to logout?',
+                function() {
+                    window.location.href = '/login_page';
+                }
+            );
+        }
 </script>
     <script src="/static/main.js"></script>
 </body>

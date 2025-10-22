@@ -4,10 +4,90 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Client Dashboard - IConnect</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+        <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='icon.ico') }}">
+    <script>
+    tailwind.config = {
+    darkMode: 'class',
+    theme: {
+    extend: {
+    colors: {
+    primary:'#3b82f6',
+    secondary:'#10b981',
+    dark: {
+    900: '#111827',
+    800: '#1F2937',
+    700: '#374151',
+    600: '#4B5563',
+    500: '#6B7280',
+    400: '#9CA3AF'
+    }
+    },
+    borderRadius: {
+    'none':'0px',
+    'sm':'4px',
+    DEFAULT:'8px',
+    'md':'12px',
+    'lg':'16px',
+    'xl':'20px',
+    '2xl':'24px',
+    '3xl':'32px',
+    'full':'9999px',
+    'button':'8px'
+    }
+    }
+    }
+    }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
     <link href='static/main.css' rel='stylesheet'>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        .account-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            min-width: 200px;
+            background: white;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            z-index: 100;
+        }
+        .account-dropdown.show {
+            display: block;
+        }
+        .account-dropdown a {
+            display: block;
+            padding: 12px 16px;
+            color: #4b5563;
+            transition: all 0.2s;
+        }
+        .account-dropdown a:hover {
+            background: #f3f4f6;
+            color: #1e40af;
+        }
+        .account-dropdown hr {
+            border-color: #e5e7eb;
+            margin: 4px 0;
+        }
+        .dark .account-dropdown {
+            background: #1F2937;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+        }
+        .dark .account-dropdown a {
+            color: #9CA3AF;
+        }
+        .dark .account-dropdown a:hover {
+            background: #374151;
+            color: #3b82f6;
+        }
+        .dark .account-dropdown hr {
+            border-color: #374151;
+        }
         .job-card {
             transition: all 0.3s ease;
         }
@@ -15,11 +95,17 @@
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
+        .dark .job-card:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
         .application-card {
             border-left: 4px solid #3b82f6;
         }
         .application-card:hover {
             background-color: #f8fafc;
+        }
+        .dark .application-card:hover {
+            background-color: #374151;
         }
         .badge {
             display: inline-block;
@@ -36,60 +122,245 @@
             background-color: #dcfce7;
             color: #166534;
         }
+        
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .modal-overlay.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            animation: slideUp 0.3s ease;
+        }
+        
+        .dark .modal-content {
+            background: #1F2937;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        /* Toast Notification Styles */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 8px;
+            padding: 16px 20px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 2000;
+            animation: slideInRight 0.3s ease;
+            max-width: 400px;
+        }
+        
+        .dark .toast {
+            background: #1F2937;
+        }
+        
+        .toast.success {
+            border-left: 4px solid #10b981;
+        }
+        
+        .toast.error {
+            border-left: 4px solid #ef4444;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+        
+        /* Cover Letter Modal */
+        .cover-letter-modal {
+            max-width: 600px;
+        }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
-    <!-- Header -->
-    <header class="bg-white shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-4">
-                <div class="flex items-center">
-                    <h1 class="text-2xl font-bold text-gray-900">Client Dashboard</h1>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-200">
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="flex items-start mb-4">
+                <div class="flex-shrink-0 bg-red-100 dark:bg-red-900/20 rounded-full p-3">
+                    <i class="fas fa-exclamation-triangle text-red-600 dark:text-red-400 text-xl"></i>
                 </div>
-                <div class="flex items-center space-x-4">
-                    <span id="welcomeText" class="text-gray-600">Welcome!</span>
-                    <a href="/dashboard" class="text-blue-600 hover:underline">Profile</a>
-                    <a href="/logout" class="text-red-600 hover:underline">Logout</a>
+                <div class="ml-4 flex-1">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2" id="modalTitle">Confirm Action</h3>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm" id="modalMessage">Are you sure?</p>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6">
+                <button onclick="closeModal()" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 font-medium transition-colors">
+                    Cancel
+                </button>
+                <button id="confirmButton" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium transition-colors">
+                    Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Cover Letter Modal -->
+    <div id="coverLetterModal" class="modal-overlay">
+        <div class="modal-content cover-letter-modal">
+            <div class="flex items-start mb-4">
+                <div class="flex-shrink-0 bg-blue-100 dark:bg-blue-900/20 rounded-full p-3">
+                    <i class="fas fa-file-alt text-blue-600 dark:text-blue-400 text-xl"></i>
+                </div>
+                <div class="ml-4 flex-1">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1" id="coverLetterApplicant">Cover Letter</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400" id="coverLetterJob"></p>
+                </div>
+                <button onclick="closeCoverLetterModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="mt-4 max-h-96 overflow-y-auto">
+                <p class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap" id="coverLetterContent"></p>
+            </div>
+            <div class="flex justify-end mt-6">
+                <button onclick="closeCoverLetterModal()" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 font-medium transition-colors">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- Header -->
+    <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50 transition-colors duration-200">
+        <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center">
+                <a href="/" class="text-2xl font-['Pacifico'] text-primary mr-10">Iconnect</a>
+                <nav class="hidden md:flex space-x-8">
+                    <a href="index" class="text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary font-medium">Home</a>
+                    <a href="client-dashboard" data-role-only="Client" class="text-primary dark:text-primary font-medium border-b-2 border-primary">Dashboard</a>
+                    <a href="my-applications" data-role-only="Job Seeker" class="text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary font-medium">Applications</a>
+                    <a href="browse" data-role-only="Client" class="text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary font-medium">Browse Workers</a>
+                    <a href="clients" data-role-only="Job Seeker" class="text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary font-medium">Browse Clients</a>
+                    <a href="how_it_works" class="text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary font-medium">How It Works</a>
+                    <a href="about" class="text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary font-medium">About Us</a>
+                </nav>
+            </div>
+            <div class="flex items-center space-x-4">
+                <!-- Account Button with Dropdown -->
+                <div class="relative">
+                    <button id="accountButton" class="flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:text-primary">
+                        <i class="ri-account-circle-line ri-xl"></i>
+                        <span class="hidden md:inline" id="welcomeText">Account</span>
+                        <i class="ri-arrow-down-s-line" id="accountArrow"></i>
+                    </button>
+                    
+                    <div id="accountDropdown" class="account-dropdown">
+                        <a href="/account"><i class="ri-user-line mr-2"></i>Profile</a>
+                        <a href="/my-applications" data-role-only="Job Seeker"><i class="ri-file-list-line mr-2"></i>My Applications</a>
+                        <a href="/client-dashboard" data-role-only="Client"><i class="ri-dashboard-line mr-2"></i>Dashboard</a>
+                        <hr>
+                        <a href="/help"><i class="ri-question-line mr-2"></i>Help Center</a>
+                        <a href="#" onclick="logout()"><i class="ri-logout-box-line mr-2"></i>Logout</a>
+                    </div>
+                </div>
+                
+                <button onclick="refreshData()" class="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 font-medium">
+                    <i class="ri-refresh-line ri-lg"></i>
+                </button>
+                
+                <div class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 cursor-pointer" id="mobileMenuToggle">
+                    <i class="ri-menu-line ri-lg dark:text-gray-300"></i>
+                </div>
+                <div class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 cursor-pointer" id="darkModeToggle">
+                    <i class="ri-sun-line ri-lg dark:text-gray-300" id="themeIcon"></i>
                 </div>
             </div>
         </div>
     </header>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Stats Cards -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="bg-white rounded-lg shadow p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 transition-colors duration-200">
                 <div class="flex items-center">
-                    <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                    <div class="p-3 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400">
                         <i class="fas fa-briefcase text-xl"></i>
                     </div>
                     <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Total Jobs Posted</p>
-                        <p id="totalJobs" class="text-2xl font-semibold text-gray-900">0</p>
+                        <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Jobs Posted</p>
+                        <p id="totalJobs" class="text-2xl font-semibold text-gray-900 dark:text-white">0</p>
                     </div>
                 </div>
             </div>
             
-            <div class="bg-white rounded-lg shadow p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 transition-colors duration-200">
                 <div class="flex items-center">
-                    <div class="p-3 rounded-full bg-green-100 text-green-600">
+                    <div class="p-3 rounded-full bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400">
                         <i class="fas fa-users text-xl"></i>
                     </div>
                     <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Total Applications</p>
-                        <p id="totalApplications" class="text-2xl font-semibold text-gray-900">0</p>
+                        <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Applications</p>
+                        <p id="totalApplications" class="text-2xl font-semibold text-gray-900 dark:text-white">0</p>
                     </div>
                 </div>
             </div>
             
-            <div class="bg-white rounded-lg shadow p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 transition-colors duration-200">
                 <div class="flex items-center">
-                    <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                    <div class="p-3 rounded-full bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400">
                         <i class="fas fa-chart-line text-xl"></i>
                     </div>
                     <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Avg. Applications per Job</p>
-                        <p id="avgApplications" class="text-2xl font-semibold text-gray-900">0</p>
+                        <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Avg. Applications per Job</p>
+                        <p id="avgApplications" class="text-2xl font-semibold text-gray-900 dark:text-white">0</p>
                     </div>
                 </div>
             </div>
@@ -98,11 +369,11 @@
         <!-- Main Content -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <!-- Posted Jobs -->
-            <div class="bg-white rounded-lg shadow">
-                <div class="px-6 py-4 border-b border-gray-200">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow transition-colors duration-200">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                     <div class="flex justify-between items-center">
-                        <h2 class="text-lg font-semibold text-gray-900">Your Posted Jobs</h2>
-                        <a href="/addClient" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">
+                        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Your Posted Jobs</h2>
+                        <a href="/addClient" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition">
                             <i class="fas fa-plus mr-2"></i>Post New Job
                         </a>
                     </div>
@@ -115,9 +386,9 @@
             </div>
 
             <!-- Recent Applications -->
-            <div class="bg-white rounded-lg shadow">
-                <div class="px-6 py-4 border-b border-gray-200">
-                    <h2 class="text-lg font-semibold text-gray-900">Recent Applications</h2>
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow transition-colors duration-200">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Recent Applications</h2>
                 </div>
                 <div class="p-6">
                     <div id="recentApplicationsList" class="space-y-4">
@@ -131,11 +402,11 @@
     <!-- Application Details Modal -->
     <div id="applicationModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
         <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
-                <div class="px-6 py-4 border-b border-gray-200">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto transition-colors duration-200">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                     <div class="flex justify-between items-center">
-                        <h3 class="text-lg font-semibold text-gray-900">Applications for: <span id="modalJobTitle"></span></h3>
-                        <button onclick="closeApplicationModal()" class="text-gray-400 hover:text-gray-600">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Applications for: <span id="modalJobTitle"></span></h3>
+                        <button onclick="closeApplicationModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
@@ -149,10 +420,164 @@
         </div>
     </div>
 
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white pt-16 pb-8 mt-16">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
+                <div class="lg:col-span-2">
+                    <a href="#" class="text-2xl font-['Pacifico'] text-white mb-4 inline-block">Iconnect</a>
+                    <p class="text-gray-400 mb-6 max-w-md">Connecting skilled professionals with businesses looking for quality talent. Our platform makes it easy to find work or hire the perfect candidate.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 hover:bg-primary transition-colors">
+                            <i class="ri-facebook-fill"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 hover:bg-primary transition-colors">
+                            <i class="ri-twitter-fill"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 hover:bg-primary transition-colors">
+                            <i class="ri-linkedin-fill"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 hover:bg-primary transition-colors">
+                            <i class="ri-instagram-fill"></i>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">For Workers</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Find Jobs</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Create Profile</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Career Resources</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Success Stories</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">FAQ</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">For Clients</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Post a Job</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Browse Talent</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Enterprise Solutions</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Success Stories</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Resources</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Company</h4>
+                    <ul class="space-y-3">
+                        <li><a href="/about" class="text-gray-400 hover:text-white">About Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Press</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Careers</a></li>
+                        <li><a href="/help" class="text-gray-400 hover:text-white">Contact</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Blog</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-8">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="mb-4 md:mb-0">
+                        <p class="text-gray-400">&copy; 2025 Iconnect. All rights reserved.</p>
+                    </div>
+                    <div class="flex flex-wrap justify-center gap-4">
+                        <a href="#" class="text-gray-400 hover:text-white">Terms of Service</a>
+                        <a href="#" class="text-gray-400 hover:text-white">Privacy Policy</a>
+                        <a href="#" class="text-gray-400 hover:text-white">Cookie Policy</a>
+                        <a href="#" class="text-gray-400 hover:text-white">Accessibility</a>
+                    </div>
+                    <div class="mt-4 md:mt-0 flex items-center space-x-3">
+                        <i class="ri-visa-fill ri-lg"></i>
+                        <i class="ri-mastercard-fill ri-lg"></i>
+                        <i class="ri-paypal-fill ri-lg"></i>
+                        <i class="ri-apple-fill ri-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Chat Widget -->
+    <div class="fixed bottom-6 right-6 z-50">
+        <button onclick="window.location.href = '/help';" class="w-14 h-14 flex items-center justify-center rounded-full bg-primary text-white shadow-lg hover:bg-primary/90">
+            <i class="ri-message-3-line ri-lg"></i>
+        </button>
+    </div>
+
     <script>
         let currentUser = null;
         let allJobs = [];
         let allApplications = [];
+        
+        // Modal and Toast Functions
+        let confirmCallback = null;
+        
+        function showModal(title, message, onConfirm) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalMessage').textContent = message;
+            confirmCallback = onConfirm;
+            document.getElementById('confirmModal').classList.add('show');
+        }
+        
+        function closeModal() {
+            document.getElementById('confirmModal').classList.remove('show');
+            confirmCallback = null;
+        }
+        
+        document.getElementById('confirmButton').addEventListener('click', function() {
+            if (confirmCallback) {
+                confirmCallback();
+                confirmCallback = null;
+            }
+            closeModal();
+        });
+        
+        // Close modal when clicking outside
+        document.getElementById('confirmModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+        
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icon = type === 'success' 
+                ? '<i class="fas fa-check-circle text-green-600 dark:text-green-400 text-xl"></i>'
+                : '<i class="fas fa-exclamation-circle text-red-600 dark:text-red-400 text-xl"></i>';
+            
+            toast.innerHTML = `
+                ${icon}
+                <span class="text-gray-900 dark:text-white font-medium">${message}</span>
+                <button onclick="this.parentElement.remove()" class="ml-auto text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 5000);
+        }
+        
+        function showCoverLetterModal(applicantName, coverLetter, jobTitle) {
+            document.getElementById('coverLetterApplicant').textContent = applicantName;
+            document.getElementById('coverLetterJob').textContent = `Application for: ${jobTitle}`;
+            document.getElementById('coverLetterContent').textContent = coverLetter || 'No cover letter provided.';
+            document.getElementById('coverLetterModal').classList.add('show');
+        }
+        
+        function closeCoverLetterModal() {
+            document.getElementById('coverLetterModal').classList.remove('show');
+        }
+        
+        // Close cover letter modal when clicking outside
+        document.getElementById('coverLetterModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeCoverLetterModal();
+            }
+        });
 
         // Load user info and data on page load
         window.addEventListener('DOMContentLoaded', async () => {
@@ -173,7 +598,7 @@
                     throw new Error('Failed to fetch user');
                 }
                 currentUser = await response.json();
-                document.getElementById('welcomeText').textContent = `Welcome, ${currentUser.full_name}!`;
+                document.getElementById('welcomeText').textContent = currentUser.full_name || 'Account';
             } catch (error) {
                 console.error('Error loading user:', error);
                 window.location.href = '/login_page';
@@ -200,9 +625,9 @@
             if (allJobs.length === 0) {
                 jobsList.innerHTML = `
                     <div class="text-center py-8">
-                        <i class="fas fa-briefcase text-4xl text-gray-300 mb-4"></i>
-                        <p class="text-gray-500 mb-4">You haven't posted any jobs yet.</p>
-                        <a href="/addClient" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition">
+                        <i class="fas fa-briefcase text-4xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                        <p class="text-gray-500 dark:text-gray-400 mb-4">You haven't posted any jobs yet.</p>
+                        <a href="/addClient" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
                             Post Your First Job
                         </a>
                     </div>
@@ -211,15 +636,20 @@
             }
 
             jobsList.innerHTML = allJobs.map(job => `
-                <div class="job-card border border-gray-200 rounded-lg p-4 cursor-pointer" onclick="viewApplications(${job.id}, '${job.title}')">
+                <div class="job-card border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-700">
                     <div class="flex justify-between items-start">
-                        <div class="flex-1">
-                            <h3 class="font-semibold text-gray-900 mb-1">${job.title}</h3>
-                            <p class="text-sm text-gray-600 mb-2">${job.location} • ${job.job_type}</p>
-                            <p class="text-sm text-gray-500 line-clamp-2">${job.description || 'No description provided'}</p>
+                        <div class="flex-1 cursor-pointer" onclick="viewApplications(${job.id}, '${job.title}')">
+                            <h3 class="font-semibold text-gray-900 dark:text-white mb-1">${job.title}</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">${job.location} • ${job.job_type}</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">${job.description || 'No description provided'}</p>
                         </div>
-                        <div class="ml-4 text-right">
+                        <div class="ml-4 flex flex-col items-end space-y-2">
                             <span class="badge badge-primary">Click to view applications</span>
+                            <button onclick="deleteJob(${job.id}, '${job.title.replace(/'/g, "\\'")}'); event.stopPropagation();" 
+                                    class="inline-flex items-center px-3 py-1 bg-red-600 text-white text-xs rounded-lg hover:bg-red-700 transition"
+                                    title="Delete this job and all its applications">
+                                <i class="fas fa-trash mr-1"></i>Delete Job
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -254,22 +684,22 @@
             const recentApps = allApplications.slice(0, 5); // Show only recent 5
 
             if (recentApps.length === 0) {
-                recentList.innerHTML = '<p class="text-gray-500 text-center py-4">No applications yet.</p>';
+                recentList.innerHTML = '<p class="text-gray-500 dark:text-gray-400 text-center py-4">No applications yet.</p>';
                 return;
             }
 
             recentList.innerHTML = recentApps.map(app => `
-                <div class="application-card border border-gray-200 rounded-lg p-4">
+                <div class="application-card border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-700">
                     <div class="flex justify-between items-start">
                         <div class="flex-1">
-                            <h4 class="font-semibold text-gray-900">${app.applicant_name}</h4>
-                            <p class="text-sm text-gray-600">${app.applicant_email}</p>
-                            <p class="text-xs text-gray-500 mt-1">Applied for: ${app.job_title}</p>
-                            <p class="text-xs text-gray-400">${formatDate(app.created_at)}</p>
+                            <h4 class="font-semibold text-gray-900 dark:text-white">${app.applicant_name}</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">${app.applicant_email}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Applied for: ${app.job_title}</p>
+                            <p class="text-xs text-gray-400 dark:text-gray-500">${formatDate(app.created_at)}</p>
                         </div>
                         <div class="flex space-x-2 ml-4">
-                            ${app.resume_path ? `<a href="/uploads/${app.resume_path}" target="_blank" class="text-blue-600 hover:text-blue-800" title="Download Resume"><i class="fas fa-download"></i></a>` : ''}
-                            <button onclick="showCoverLetter('${app.applicant_name}', '${(app.cover_letter || 'No cover letter provided').replace(/'/g, "\\'")}', '${app.job_title}')" class="text-green-600 hover:text-green-800" title="View Cover Letter">
+                            ${app.resume_path ? `<a href="/uploads/${app.resume_path}" target="_blank" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300" title="Download Resume"><i class="fas fa-download"></i></a>` : ''}
+                            <button onclick='showCoverLetterModal(\`${app.applicant_name}\`, \`${(app.cover_letter || 'No cover letter provided').replace(/`/g, "\\`").replace(/\$/g, "\\$")}\`, \`${app.job_title}\`)' class="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300" title="View Cover Letter">
                                 <i class="fas fa-eye"></i>
                             </button>
                         </div>
@@ -291,28 +721,28 @@
                 const modalList = document.getElementById('modalApplicationsList');
                 
                 if (data.applications.length === 0) {
-                    modalList.innerHTML = '<p class="text-gray-500 text-center py-8">No applications for this job yet.</p>';
+                    modalList.innerHTML = '<p class="text-gray-500 dark:text-gray-400 text-center py-8">No applications for this job yet.</p>';
                 } else {
                     modalList.innerHTML = data.applications.map(app => `
-                        <div class="application-card border border-gray-200 rounded-lg p-4">
+                        <div class="application-card border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-700">
                             <div class="flex justify-between items-start">
                                 <div class="flex-1">
-                                    <h4 class="font-semibold text-gray-900 mb-2">${app.applicant_name}</h4>
-                                    <p class="text-sm text-gray-600 mb-1"><i class="fas fa-envelope mr-2"></i>${app.applicant_email}</p>
-                                    <p class="text-xs text-gray-500 mb-3"><i class="fas fa-calendar mr-2"></i>Applied on: ${formatDate(app.created_at)}</p>
+                                    <h4 class="font-semibold text-gray-900 dark:text-white mb-2">${app.applicant_name}</h4>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-1"><i class="fas fa-envelope mr-2"></i>${app.applicant_email}</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-3"><i class="fas fa-calendar mr-2"></i>Applied on: ${formatDate(app.created_at)}</p>
                                     
                                     <div class="flex flex-wrap gap-2">
                                         ${app.resume_path ? `
                                             <a href="/uploads/${app.resume_path}" target="_blank" 
-                                               class="inline-flex items-center px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition">
+                                               class="inline-flex items-center px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">
                                                 <i class="fas fa-download mr-2"></i>Download Resume
                                             </a>
                                         ` : ''}
                                         
-                                        <button onclick="showCoverLetter('${app.applicant_name}', '${(app.cover_letter || 'No cover letter provided').replace(/'/g, "\\'")}', '${jobTitle}')"
-                                                class="inline-flex items-center px-3 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition">
-                                            <i class="fas fa-file-alt mr-2"></i>View Cover Letter
-                                        </button>
+                        <button onclick='showCoverLetterModal(\`${app.applicant_name}\`, \`${(app.cover_letter || 'No cover letter provided').replace(/`/g, "\\`").replace(/\$/g, "\\$")}\`, \`${jobTitle}\`)'
+                                class="inline-flex items-center px-3 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition">
+                            <i class="fas fa-file-alt mr-2"></i>View Cover Letter
+                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -323,19 +753,13 @@
                 document.getElementById('applicationModal').classList.remove('hidden');
             } catch (error) {
                 console.error('Error loading applications:', error);
-                alert('Failed to load applications for this job.');
+                showToast('Failed to load applications for this job.', 'error');
             }
         }
 
         function closeApplicationModal() {
             document.getElementById('applicationModal').classList.add('hidden');
-        }
-
-        function showCoverLetter(applicantName, coverLetter, jobTitle) {
-            alert(`Cover Letter from ${applicantName} for "${jobTitle}":\n\n${coverLetter}`);
-        }
-
-        function updateStats() {
+        }        function updateStats() {
             document.getElementById('totalJobs').textContent = allJobs.length;
             document.getElementById('totalApplications').textContent = allApplications.length;
             
@@ -354,6 +778,42 @@
             });
         }
 
+        // Delete job function
+        async function deleteJob(jobId, jobTitle) {
+            // Show confirmation modal instead of alert
+            showModal(
+                'Delete Job',
+                `Are you sure you want to delete the job "${jobTitle}"?\n\nThis will also delete ALL applications for this job and cannot be undone.`,
+                async function() {
+                    try {
+                        const response = await fetch(`/api/my-jobs/${jobId}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        });
+
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            throw new Error(errorData.error || 'Failed to delete job');
+                        }
+
+                        const result = await response.json();
+                        
+                        // Show success toast
+                        showToast(result.message, 'success');
+                        
+                        // Refresh the dashboard data
+                        await refreshData();
+                        
+                    } catch (error) {
+                        console.error('Error deleting job:', error);
+                        showToast(`Failed to delete job: ${error.message}`, 'error');
+                    }
+                }
+            );
+        }
+
         // Function to refresh all data
         async function refreshData() {
             console.log('Refreshing dashboard data...');
@@ -365,25 +825,96 @@
         // Auto-refresh when window gains focus (after returning from another page)
         window.addEventListener('focus', refreshData);
 
-        // Add a visible refresh button
-        window.addEventListener('DOMContentLoaded', () => {
-            // Add refresh button to header
-            const headerActions = document.querySelector('header .flex.items-center.space-x-4');
-            if (headerActions) {
-                const refreshBtn = document.createElement('button');
-                refreshBtn.innerHTML = '<i class="fas fa-sync-alt mr-2"></i>Refresh';
-                refreshBtn.className = 'text-green-600 hover:underline';
-                refreshBtn.onclick = refreshData;
-                headerActions.insertBefore(refreshBtn, headerActions.firstChild);
-            }
-        });
-
         // Close modal when clicking outside
         document.getElementById('applicationModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeApplicationModal();
             }
         });
+
+        // Dark mode functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('darkModeToggle');
+            const icon = document.getElementById('themeIcon');
+            
+            if (localStorage.getItem('theme') === 'dark') {
+                document.documentElement.classList.add('dark');
+                icon.classList.remove('ri-sun-line');
+                icon.classList.add('ri-moon-line');
+            }
+            
+            toggle.addEventListener('click', () => {
+                document.documentElement.classList.toggle('dark');
+                const isDark = document.documentElement.classList.contains('dark');
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                icon.classList.toggle('ri-sun-line');
+                icon.classList.toggle('ri-moon-line');
+            });
+        });
+
+        // Mobile menu toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const mobileNav = document.querySelector('nav');
+            
+            if (mobileMenuToggle && mobileNav) {
+                mobileMenuToggle.addEventListener('click', function() {
+                    mobileNav.classList.toggle('hidden');
+                });
+            }
+        });
+
+        // Account dropdown
+        document.addEventListener('DOMContentLoaded', function() {
+            const accountButton = document.getElementById('accountButton');
+            const accountDropdown = document.getElementById('accountDropdown');
+            const accountArrow = document.getElementById('accountArrow');
+            
+            if (accountButton && accountDropdown) {
+                accountButton.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    accountDropdown.classList.toggle('show');
+                    
+                    // Rotate arrow icon
+                    if (accountArrow) {
+                        accountArrow.style.transform = accountDropdown.classList.contains('show') ? 'rotate(180deg)' : 'rotate(0deg)';
+                    }
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!accountButton.contains(e.target) && !accountDropdown.contains(e.target)) {
+                        accountDropdown.classList.remove('show');
+                        if (accountArrow) {
+                            accountArrow.style.transform = 'rotate(0deg)';
+                        }
+                    }
+                });
+
+                // Close dropdown when clicking on a dropdown item
+                const dropdownItems = accountDropdown.querySelectorAll('a');
+                dropdownItems.forEach(item => {
+                    item.addEventListener('click', function() {
+                        accountDropdown.classList.remove('show');
+                        if (accountArrow) {
+                            accountArrow.style.transform = 'rotate(0deg)';
+                        }
+                    });
+                });
+            }
+        });
+
+        // Logout function
+        function logout() {
+            showModal(
+                'Confirm Logout',
+                'Are you sure you want to logout?',
+                function() {
+                    window.location.href = '/login_page';
+                }
+            );
+        }
     </script>
+    <script src="/static/main.js"></script>
 </body>
 </html>

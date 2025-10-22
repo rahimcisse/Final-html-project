@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
 <link href='static/main.css' rel='stylesheet'>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='icon.ico') }}">
 
 <script> 
 tailwind.config = {
@@ -112,11 +113,14 @@ DEFAULT:'8px',
         <div class="container mx-auto px-4 py-4 flex items-center justify-between">
             <div class="flex items-center">
                 <a href="#" class="text-2xl font-['Pacifico'] text-primary mr-10">Iconnect</a>
-                <nav class="hidden md:flex space-x-8">
-                    <a href="index" class="text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary font-medium">Home</a>
-                    <a href="browse" class="text-primary dark:text-primary font-medium border-b-2 border-primary">Browse Jobs</a>
-                    <a href="how_it_works" class="text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary font-medium">How It Works</a>
-                    <a href="about" class="text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary font-medium">About Us</a>
+<nav class="hidden md:flex space-x-8">
+                    <a href="index" class="text-primary dark:text-primary font-medium border-b-2 border-primary">Home</a>
+                    <a href="client-dashboard" data-role-only="Client" class="text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary font-medium">Dashboard</a>
+                    <a href="my-applications" data-role-only="Job Seeker" class="text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary font-medium">Applications</a>
+                    <a href="browse" data-role-only="Client" class="text-gray-700 dark:text-gray-300 hover:text-primary font-medium">Browse Workers</a>
+                    <a href="clients" data-role-only="Job Seeker" class="text-gray-700 dark:text-gray-300 hover:text-primary font-medium">Browse Clients</a>
+                    <a href="how_it_works" class="text-gray-700 dark:text-gray-300 hover:text-primary font-medium">How It Works</a>
+                    <a href="about" class="text-gray-700 dark:text-gray-300 hover:text-primary font-medium">About Us</a>
                 </nav>
             </div>
             <div class="flex items-center space-x-4">
@@ -135,6 +139,14 @@ DEFAULT:'8px',
                         <a href="account" class="flex items-center space-x-2">
                             <i class="ri-user-line"></i>
                             <span>Profile</span>
+                        </a>
+                        <a href="client-dashboard" data-role-only="Client" class="flex items-center space-x-2">
+                            <i class="ri-file-list-2-line"></i>
+                            <span>My Dashboard</span>
+                        </a>
+                        <a href="my-applications" data-role-only="Job Seeker" class="flex items-center space-x-2">
+                            <i class="ri-file-list-2-line"></i>
+                            <span>My Applications</span>
                         </a>
                         <a href="#" class="flex items-center space-x-2">
                             <i class="ri-settings-3-line"></i>
