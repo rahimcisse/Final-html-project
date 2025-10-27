@@ -18,6 +18,12 @@ def landing():
 
 @app.route("/index")
 def index():
+    # Check if user is logged in and has completed profile
+    if 'user_id' in session:
+        user = User.query.get(session['user_id'])
+        if user and not user.profile_completed:
+            # Redirect to additional info page if profile is not completed
+            return redirect('/additional-info')
     return render_template('index.html')
 
 @app.route('/browse')
@@ -115,7 +121,13 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(150), nullable=False)
     email = db.Column(db.String(150), unique=True, nullable=False)
+    role = db.Column(db.String(150), nullable=True)
     password_hash = db.Column(db.String(200), nullable=False)
+    phone = db.Column(db.String(20), nullable=True)
+    date_of_birth = db.Column(db.Date, nullable=True)
+    gender = db.Column(db.String(50), nullable=True)
+    location = db.Column(db.String(200), nullable=True)
+    profile_completed = db.Column(db.Boolean, default=False, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def set_password(self, password):
@@ -130,17 +142,21 @@ def signup():
     data = request.get_json()
     name = data.get('name')
     email = data.get('email')
+    role = data.get('role')
     password = data.get('password')
 
     if User.query.filter_by(email=email).first():
         return jsonify({'error': 'Email already registered'}), 400
 
-    new_user = User(name=name, email=email, created_at=datetime.utcnow())
+    new_user = User(name=name, email=email, role=role, created_at=datetime.utcnow())
     new_user.set_password(password)
     db.session.add(new_user)
     db.session.commit()
+    
+    # Store user ID in session after successful signup
+    session['user_id'] = new_user.id
 
-    return jsonify({'message': 'Signup successful'})
+    return jsonify({'message': 'Signup successful', 'redirect': '/additional-info'})
 
 @app.route('/api/login', methods=['POST'])
 def login():
@@ -166,7 +182,12 @@ def get_user():
     return jsonify({
         'full_name': user.name,
         'email': user.email,
-        # 'phone': user.phone,
+        'role': user.role or '',
+        'phone': user.phone or '',
+        'date_of_birth': user.date_of_birth.strftime('%Y-%m-%d') if user.date_of_birth else '',
+        'gender': user.gender or '',
+        'location': user.location or '',
+        'profile_completed': user.profile_completed,
         'created_at': user.created_at.strftime('%B %d, %Y')  # Format the date
     })
 
@@ -281,7 +302,11 @@ def update_profile():
     data = request.get_json()
     full_name = data.get('full_name')
     email = data.get('email')
+    role = data.get('role')
     phone = data.get('phone')
+    date_of_birth = data.get('date_of_birth')
+    gender = data.get('gender')
+    location = data.get('location')
     
     # Validate input
     if not full_name or not email:
@@ -295,8 +320,20 @@ def update_profile():
     # Update user information
     user.name = full_name
     user.email = email
+    
+    if role:
+        user.role = role
     if phone:
         user.phone = phone
+    if date_of_birth:
+        try:
+            user.date_of_birth = datetime.strptime(date_of_birth, '%Y-%m-%d').date()
+        except ValueError:
+            return jsonify({'error': 'Invalid date format'}), 400
+    if gender:
+        user.gender = gender
+    if location:
+        user.location = location
     
     db.session.commit()
     
@@ -333,6 +370,80 @@ def details():
     if 'user_id' not in session:
         return redirect('/login_page')
     return render_template('details.html')
+
+# New route for the additional info page
+@app.route('/additional-info')
+def additional_info():
+    if 'user_id' not in session:
+        return redirect('/login_page')
+    
+    # Check if user has already completed their profile
+    user = User.query.get(session['user_id'])
+    if user and user.profile_completed:
+        return redirect('/index')  # Redirect to main page if already completed
+    
+    return render_template('additional_info.html')
+
+# New route to handle additional info submission
+@app.route('/api/complete-profile', methods=['POST'])
+def complete_profile():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'error': 'Not logged in'}), 401
+    
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    
+    data = request.get_json()
+    phone = data.get('phone')
+    date_of_birth = data.get('date_of_birth')
+    gender = data.get('gender')
+    location = data.get('location')
+    
+    # Update user information
+    if phone:
+        user.phone = phone
+    if date_of_birth:
+        try:
+            dob_date = datetime.strptime(date_of_birth, '%Y-%m-%d').date()
+            # Check if user is at least 13 years old
+            today = datetime.now().date()
+            age = today.year - dob_date.year - ((today.month, today.day) < (dob_date.month, dob_date.day))
+            if age < 13:
+                return jsonify({'error': 'You must be at least 13 years old to use this service'}), 400
+            user.date_of_birth = dob_date
+        except ValueError:
+            return jsonify({'error': 'Invalid date format'}), 400
+    if gender:
+        user.gender = gender
+    if location:
+        user.location = location
+    
+    # Mark profile as completed
+    user.profile_completed = True
+    
+    db.session.commit()
+    
+    return jsonify({'message': 'Profile completed successfully'})
+
+# Route to skip additional info
+@app.route('/api/skip-profile', methods=['POST'])
+def skip_profile():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'error': 'Not logged in'}), 401
+    
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    
+    # Mark profile as completed even if skipped
+    user.profile_completed = True
+    db.session.commit()
+    
+    return jsonify({'message': 'Profile setup skipped successfully'})
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()

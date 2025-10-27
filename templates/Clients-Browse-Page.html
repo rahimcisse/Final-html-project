@@ -652,7 +652,7 @@ DEFAULT:'8px',
                                     ${isUnavailable ? '<div class="bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 px-3 py-1 rounded-full text-xs font-medium">Unavailable</div>' : ''}
                                 </div>
                                 <div class="flex flex-wrap gap-2 mb-4">
-                                    ${(clients.skills || '').split(',').map(skill => `
+                                    ${(clients.duration || '').split(',').map(skill => `
                                         <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">${skill.trim()}</span>
                                     `).join('')}
                                 </div>
@@ -898,7 +898,7 @@ DEFAULT:'8px',
                             <div><strong>Type:</strong> <span id="clientDetailsJobType"></span></div>
                         </div>
                         <div class="mt-4 text-sm text-gray-700 dark:text-gray-300">
-                            <div><strong>Website:</strong> <a id="clientDetailsWebsite" href="#" target="_blank" class="text-primary"></a></div>
+                            <div><strong>Description:</strong> <a id="clientDetailsWebsite" href="#" target="_blank" class="text-primary"></a></div>
                         </div>
                         <div id="clientDetailsDescription" class="mt-4 text-gray-700 dark:text-gray-300"></div>
                         <div class="mt-6 flex justify-end">

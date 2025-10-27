@@ -135,8 +135,8 @@
                                 </div>
                                 <select id="signuprole" class="input-field w-full pl-10 pr-4 py-3 rounded-lg bg-white bg-opacity-20 text-white placeholder-gray-300 focus:outline-none" required>
                                     <option value="" disabled selected class="text-gray-400">Select role</option>
-                                    <option value="Job Seeker">Job Seeker</option>
-                                    <option value="Client">Client</option>
+                                    <option style="color: black" value="Job Seeker">Job Seeker</option>
+                                    <option style="color: black" value="Client">Client</option>
                                 </select>
                             </div>
                         </div>
@@ -507,10 +507,17 @@ toggleForms.forEach(button => {
             
             if (signupResponse.ok) {
                 showToast(signupData.message || 'Account created successfully');
-                loginForm.classList.remove('hidden');
-                signupForm.classList.add('hidden');
-                this.reset();
-                otpCode.value = '';
+                // Check if there's a redirect URL in the response
+                if (signupData.redirect) {
+                    setTimeout(() => {
+                        window.location.href = signupData.redirect;
+                    }, 1500);
+                } else {
+                    loginForm.classList.remove('hidden');
+                    signupForm.classList.add('hidden');
+                    this.reset();
+                    otpCode.value = '';
+                }
             } else {
                 showToast(signupData.error || 'Signup failed', true);
             }

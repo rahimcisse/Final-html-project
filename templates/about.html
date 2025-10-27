@@ -6,37 +6,40 @@
         <title>About Iconnect - Connect Workers with Clients</title>
         <script src="https://cdn.tailwindcss.com/3.4.16"></script>
         <script>
-            tailwind.config = {
-                darkMode: 'class',
-                theme: {
-                    extend: {
-                        colors: {
-                            primary: '#3b82f6',
-                            secondary: '#10b981',
-                            dark: {
-                                900: '#111827',
-                                800: '#1F2937',
-                                700: '#374151',
-                                600: '#4B5563',
-                                500: '#6B7280',
-                                400: '#9CA3AF'
-                            }
-                        },
-                        borderRadius: {
-                            'none': '0px',
-                            'sm': '4px',
-                            DEFAULT: '8px',
-                            'md': '12px',
-                            'lg': '16px',
-                            'xl': '20px',
-                            '2xl': '24px',
-                            '3xl': '32px',
-                            'full': '9999px',
-                            'button': '8px'
-                        }
-                    }
-                }
-            }
+                
+        tailwind.config = {
+darkMode: 'class',
+theme: {
+extend: {
+colors: {
+primary:'#3b82f6',
+secondary:'#10b981',
+dark: {
+900: '#111827',
+800: '#1F2937',
+700: '#374151',
+600: '#4B5563',
+500: '#6B7280',
+400: '#9CA3AF'
+}
+},
+borderRadius: {
+'none':'0px',
+'sm':'4px',
+DEFAULT:'8px',
+'md':'12px',
+'lg':'16px',
+'xl':'20px',
+'2xl':'24px',
+'3xl':'32px',
+'full':'9999px',
+'button':'8px'
+}
+}
+}
+}
+
+    </script>
         </script>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -88,20 +91,35 @@
                 background: #1F2937;
                 box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
             }
-            .account-dropdown a {
-                display: block;
-                padding: 12px 16px;
-                color: #4b5563;
-                transition: all 0.2s;
-            }
-            
-            
-            .account-dropdown a:hover {
-                background: #f3f4f6;
-                color: #1e40af;
-            }
-            
-            .dark .account-dropdown a {
+        .account-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            min-width: 200px;
+            background: white;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            z-index: 100;
+        }
+        .account-dropdown.show {
+            display: block;
+        }
+        .account-dropdown a {
+            display: block;
+            padding: 12px 16px;
+            color: #4b5563;
+            transition: all 0.2s;
+        }
+        .account-dropdown a:hover {
+            background: #f3f4f6;
+            color: #1e40af;
+        }
+        .account-dropdown hr {
+            border-color: #e5e7eb;
+            margin: 4px 0;
+        }
+                    .dark .account-dropdown a {
                 color: #9CA3AF;
             }
             
@@ -116,14 +134,9 @@
                 border-color: #e5e7eb;
                 margin: 4px 0;
             }
-            
-            
-            .account-dropdown .text-red-500:hover {
-                color: #ef4444 !important;
-            }
-            
-            .dark .account-dropdown .text-red-500:hover {
-                color: #f87171 !important;
+                        .dark .account-dropdown {
+                background: #1F2937;
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
             }
             
             /* Modal Styles */
@@ -175,6 +188,56 @@
                 }
             }
         </style>
+            <style>
+        /* Dark mode styles */
+.dark {
+  --tw-bg-opacity: 1;
+  background-color: rgb(17 24 39 / var(--tw-bg-opacity));
+}
+
+.dark .bg-white {
+  background-color: rgb(31 41 55 / var(--tw-bg-opacity));
+}
+
+.dark .bg-gray-50 {
+  background-color: rgb(17 24 39 / var(--tw-bg-opacity));
+}
+
+.dark .bg-gray-100 {
+  background-color: rgb(55 65 81 / var(--tw-bg-opacity));
+}
+
+.dark .bg-gray-200 {
+  background-color: rgb(75 85 99 / var(--tw-bg-opacity));
+}
+
+.dark .text-gray-700,
+.dark .text-gray-600,
+.dark .text-gray-500 {
+  color: rgb(209 213 219 / var(--tw-text-opacity));
+}
+
+.dark .text-gray-900 {
+  color: rgb(243 244 246 / var(--tw-text-opacity));
+}
+
+.dark .border-gray-200,
+.dark .border-gray-300 {
+  border-color: rgb(55 65 81 / var(--tw-border-opacity));
+}
+
+.dark .shadow-sm,
+.dark .shadow-md,
+.dark .shadow-lg {
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.5), 0 1px 2px -1px rgb(0 0 0 / 0.5);
+}
+
+
+.dark .bg-gradient-to-r {
+  background-image: linear-gradient(to right, rgba(17, 24, 39, 0.9), rgba(17, 24, 39, 0.3));
+}
+
+    </style>
     </head>
 
     <body class="bg-gray-50 dark:bg-gray-900 font-['Inter'] transition-colors duration-300" id="body">
@@ -202,7 +265,7 @@
     </div>
     
     <!-- Header -->
-    <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50">
+    <header class="bg-white shadow-sm sticky top-0 z-50">
         <div class="container mx-auto px-4 py-4 flex items-center justify-between">
             <div class="flex items-center">
                 <a href="#" class="text-2xl font-['Pacifico'] text-primary mr-10">Iconnect</a>
@@ -216,19 +279,20 @@
                     <a href="about" class="text-primary dark:text-primary font-medium border-b-2 border-primary">About Us</a>
                 </nav>
             </div>
+
             <div class="flex items-center space-x-4">
 
-                <!-- Account Button with Dropdown -->
+                                            <!-- Account Button with Dropdown -->
                 <div class="relative">
-                    <button id="accountButton" class="flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:text-primary">
+                    <button id="accountButton" class="flex items-center space-x-2 text-gray-700 hover:text-primary">
                         <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center text-white">
                             <i class="ri-user-line"></i>
                         </div>
                         <span class="hidden md:inline font-medium">Account</span>
-                        <i class="ri-arrow-down-s-line hidden md:inline transition-transform duration-200" id="accountArrow"></i>
+                        <i class="ri-arrow-down-s-line hidden md:inline"></i>
                     </button>
                     
-                    <div id="accountDropdown" class="account-dropdown">
+                    <div id="accountDropdown" class="account-dropdown mt-2">
                         <a href="account" class="flex items-center space-x-2">
                             <i class="ri-user-line"></i>
                             <span>Profile</span>
@@ -256,15 +320,15 @@
                         </a>
                     </div>
                 </div>
-                
-                <div class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 cursor-pointer" id="mobileMenuToggle">
-                    <i class="ri-menu-line ri-lg dark:text-gray-300"></i>
-                </div>
-                <div class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 cursor-pointer" id="darkModeToggle">
-                    <i class="ri-sun-line ri-lg dark:text-gray-300" id="themeIcon"></i>
-                </div>
+      <div class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 cursor-pointer" id="mobileMenuToggle">
+        <i class="ri-menu-line ri-lg dark:text-gray-300"></i>
+      </div>
+      <div class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 cursor-pointer" id="darkModeToggle">
+        <i class="ri-sun-line ri-lg dark:text-gray-300" id="themeIcon"></i>
+      </div>
             </div>
         </div>
+        
     </header>
 
     <!-- Hero Section -->

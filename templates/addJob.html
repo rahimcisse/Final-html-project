@@ -10,6 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
 <link href='static/main.css' rel='stylesheet'>
+<script src="static/main.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='icon.ico') }}">
 <script> 
@@ -257,7 +258,11 @@ DEFAULT:'8px',
         <input type="text" id="location" name="location" required class="w-full px-4 py-2 border rounded-md dark:bg-dark-800">
       </div>
       <div>
-        <label for="job_type" class="block mb-1 font-medium">Job Type</label>
+        <label for="skills" class="block mb-1 font-medium">Skills(separate with commas)</label>
+        <input type="text" id="skills" name="skills" required class="w-full px-4 py-2 border rounded-md dark:bg-dark-800">
+      </div>
+      <div>
+        <label for="job_type" class="block mb-1 font-medium">Contact info</label>
         <input type="text" id="job_type" name="job_type" required class="w-full px-4 py-2 border rounded-md dark:bg-dark-800">
       </div>
       <div>
@@ -276,6 +281,7 @@ document.getElementById('addJobForm').addEventListener('submit', async function 
   const payload = {
     title: document.getElementById('title').value,
     location: document.getElementById('location').value,
+    skills:document.getElementById('skills').value,
     job_type: document.getElementById('job_type').value,
     description: document.getElementById('description').value
   };

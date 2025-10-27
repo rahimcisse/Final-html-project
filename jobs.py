@@ -20,6 +20,12 @@ def landing():
 
 @app.route("/index")
 def index():
+    # Check if user is logged in and has completed profile
+    if 'user_id' in session:
+        user = User.query.get(session['user_id'])
+        if user and not user.profile_completed:
+            # Redirect to additional info page if profile is not completed
+            return redirect('/additional-info')
     return render_template('index.html')
 
 # Client Dashboard route
@@ -80,6 +86,7 @@ def init_workers_db():
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     title TEXT NOT NULL,
                     location TEXT NOT NULL,
+                    skills TEXT NOT NULL,
                     job_type TEXT NOT NULL,
                     description TEXT
                 )''')
@@ -97,13 +104,14 @@ def get_workers():
         c.execute('''SELECT * FROM workers WHERE 
                         title LIKE ? OR 
                         location LIKE ? OR 
+                        skills LIKE ? OR 
                         job_type LIKE ? OR 
                         description LIKE ?''',
-                  tuple([f"%{query}%"] * 4))
+                  tuple([f"%{query}%"] * 5))
     else:
         c.execute('SELECT * FROM workers')
-    workers = [dict(id=row[0], title=row[1], location=row[2],
-                 job_type=row[3], description=row[4])
+    workers = [dict(id=row[0], title=row[1], location=row[2], skills=row[3],
+                 job_type=row[4], description=row[5])
             for row in c.fetchall()]
     conn.close()
     return jsonify(workers)
@@ -113,10 +121,9 @@ def add_worker():
     data = request.get_json()
     conn = sqlite3.connect('workers.db')
     c = conn.cursor()
-    c.execute('''INSERT INTO workers (title, location, job_type, description)
-                 VALUES (?, ?, ?, ? )''',
-              (data['title'], data['location'],
-               data['job_type'], data['description']))
+    c.execute('''INSERT INTO workers (title, location, skills, job_type, description)
+                 VALUES (?, ?, ?, ?, ?)''',
+              (data['title'], data['location'], data['skills'], data['job_type'], data['description']))
     conn.commit()
     conn.close()
     return jsonify({'status': 'success'}), 201
@@ -731,6 +738,11 @@ class User(db.Model):
     email = db.Column(db.String(150), unique=True, nullable=False)
     role = db.Column(db.String(150), nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
+    phone = db.Column(db.String(20), nullable=True)
+    date_of_birth = db.Column(db.Date, nullable=True)
+    gender = db.Column(db.String(50), nullable=True)
+    location = db.Column(db.String(200), nullable=True)
+    profile_completed = db.Column(db.Boolean, default=False, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def set_password(self, password):
@@ -755,8 +767,11 @@ def signup():
     new_user.set_password(password)
     db.session.add(new_user)
     db.session.commit()
+    
+    # Store user ID in session after successful signup
+    session['user_id'] = new_user.id
 
-    return jsonify({'message': 'Signup successful'})
+    return jsonify({'message': 'Signup successful', 'redirect': '/additional-info'})
 
 @app.route('/api/login', methods=['POST'])
 def login():
@@ -783,8 +798,11 @@ def get_user():
         'full_name': user.name,
         'email': user.email,
         'role': user.role,
-
-        # 'phone': user.phone,
+        'phone': user.phone or '',
+        'date_of_birth': user.date_of_birth.strftime('%Y-%m-%d') if user.date_of_birth else '',
+        'gender': user.gender or '',
+        'location': user.location or '',
+        'profile_completed': user.profile_completed,
         'created_at': user.created_at.strftime('%B %d, %Y')  # Format the date
     })
 
@@ -902,6 +920,9 @@ def update_profile():
     email = data.get('email')
     role = data.get('role')
     phone = data.get('phone')
+    date_of_birth = data.get('date_of_birth')
+    gender = data.get('gender')
+    location = data.get('location')
     
     # Validate input
     if not full_name or not email:
@@ -916,9 +937,19 @@ def update_profile():
     user.name = full_name
     user.email = email
     
-    user.role = role
+    if role:
+        user.role = role
     if phone:
         user.phone = phone
+    if date_of_birth:
+        try:
+            user.date_of_birth = datetime.strptime(date_of_birth, '%Y-%m-%d').date()
+        except ValueError:
+            return jsonify({'error': 'Invalid date format'}), 400
+    if gender:
+        user.gender = gender
+    if location:
+        user.location = location
     
     db.session.commit()
     
@@ -955,6 +986,79 @@ def details():
     if 'user_id' not in session:
         return redirect('/login_page')
     return render_template('details.html')
+
+# New route for the additional info page
+@app.route('/additional-info')
+def additional_info():
+    if 'user_id' not in session:
+        return redirect('/login_page')
+    
+    # Check if user has already completed their profile
+    user = User.query.get(session['user_id'])
+    if user and user.profile_completed:
+        return redirect('/index')  # Redirect to main page if already completed
+    
+    return render_template('additional_info.html')
+
+# New route to handle additional info submission
+@app.route('/api/complete-profile', methods=['POST'])
+def complete_profile():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'error': 'Not logged in'}), 401
+    
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    
+    data = request.get_json()
+    phone = data.get('phone')
+    date_of_birth = data.get('date_of_birth')
+    gender = data.get('gender')
+    location = data.get('location')
+    
+    # Update user information
+    if phone:
+        user.phone = phone
+    if date_of_birth:
+        try:
+            dob_date = datetime.strptime(date_of_birth, '%Y-%m-%d').date()
+            # Check if user is at least 13 years old
+            today = datetime.now().date()
+            age = today.year - dob_date.year - ((today.month, today.day) < (dob_date.month, dob_date.day))
+            if age < 13:
+                return jsonify({'error': 'You must be at least 13 years old to use this service'}), 400
+            user.date_of_birth = dob_date
+        except ValueError:
+            return jsonify({'error': 'Invalid date format'}), 400
+    if gender:
+        user.gender = gender
+    if location:
+        user.location = location
+    
+    # Mark profile as completed
+    user.profile_completed = True
+    
+    db.session.commit()
+    
+    return jsonify({'message': 'Profile completed successfully'})
+
+# Route to skip additional info
+@app.route('/api/skip-profile', methods=['POST'])
+def skip_profile():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'error': 'Not logged in'}), 401
+    
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    
+    # Mark profile as completed even if skipped
+    user.profile_completed = True
+    db.session.commit()
+    
+    return jsonify({'message': 'Profile setup skipped successfully'})
 
 
 # Dashboard route
